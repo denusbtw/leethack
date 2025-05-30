@@ -43,6 +43,13 @@ class Hackathon(UUIDModel, TimestampedModel):
     prize = models.PositiveIntegerField(help_text=_("Prize for winning hackathon."))
     start_datetime = models.DateTimeField(help_text=_("Start date and time of hackathon."))
     end_datetime = models.DateTimeField(help_text=_("End date and time of hackathon."))
+    winner = models.ForeignKey(
+        "participations.Participant",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="won_hackathons"
+    )
 
     class Meta:
         constraints = [
