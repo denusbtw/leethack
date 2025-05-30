@@ -50,6 +50,7 @@ LOCAL_APPS = [
     "leethack.core",
     "leethack.users",
     "leethack.hackathons",
+    "leethack.participations"
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
