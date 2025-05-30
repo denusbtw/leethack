@@ -44,7 +44,9 @@ DJANGO_APPS = [
     'django.contrib.staticfiles',
 ]
 
-THIRD_PARTY_APPS = []
+THIRD_PARTY_APPS = [
+    "rest_framework",
+]
 
 LOCAL_APPS = [
     "leethack.core",
@@ -102,3 +104,8 @@ TEMPLATES = [
 
 
 STATIC_URL = 'static/'
+
+
+REST_FRAMEWORK = {
+    "EXCEPTION_HANDLER": "leethack.api.exceptions.custom_exception_handler"
+}
