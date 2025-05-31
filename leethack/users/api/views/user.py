@@ -9,9 +9,12 @@ User = get_user_model()
 
 
 class MeDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = User.objects.all()
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user
 
     def get_serializer_class(self):
-        if self.request.method in permissions.SAFE_METHODS:
+        if self.request.method == "GET":
             return MeRetrieveSerializer
         return MeUpdateSerializer
