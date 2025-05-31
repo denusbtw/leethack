@@ -14,7 +14,7 @@ class TestCategoryListAPIView:
     def test_returns_all_categories(self, api_client, list_url, category_factory):
         category_factory.create_batch(2)
         response = api_client.get(list_url)
-        assert len(response.data) == 2
+        assert response.data["count"] == 2
 
     class TestPermissions:
 

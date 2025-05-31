@@ -2,7 +2,8 @@ from rest_framework import generics, permissions, filters
 
 from leethack.core.api.permissions import ReadOnly, PostOnly
 from leethack.hackathons.api.v1.permissions import IsHackathonHost
-from leethack.participations.api.v1.serializers import (
+from .pagination import HackathonParticipationRequestPagination
+from ..serializers import (
     HackathonParticipationRequestListSerializer,
     HackathonParticipationRequestCreateSerializer,
     HackathonParticipationRequestRetrieveSerializer,
@@ -20,6 +21,7 @@ class HackathonParticipationRequestListCreateAPIView(generics.ListCreateAPIView)
         ReadOnly & (permissions.IsAdminUser | IsHackathonHost)
         | (PostOnly & permissions.IsAuthenticated)
     ]
+    pagination_class = HackathonParticipationRequestPagination
     filter_backends = (filters.OrderingFilter, filters.SearchFilter)
     search_fields = (
         "user__username",

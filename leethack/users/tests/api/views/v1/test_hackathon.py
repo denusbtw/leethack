@@ -30,7 +30,7 @@ class TestMyParticipatedHackathonListAPIView:
 
         response = api_client.get(my_participated_hackathon_list_url)
         assert response.status_code == status.HTTP_200_OK
-        assert len(response.data) == 2
+        assert response.data["count"] == 2
 
     class TestPermissions:
 
@@ -84,7 +84,7 @@ class TestMyHostedHackathonListAPIView:
 
         response = api_client.get(my_hosted_hackathon_list_url)
         assert response.status_code == status.HTTP_200_OK
-        assert len(response.data) == 2
+        assert response.data["count"] == 2
 
     class TestPermissions:
 
@@ -136,7 +136,7 @@ class TestUserHostedHackathonListAPIView:
 
         response = api_client.get(user_hosted_hackathon_list)
         assert response.status_code == status.HTTP_200_OK
-        assert len(response.data) == 2
+        assert response.data["count"] == 2
 
     class TestPermissions:
 

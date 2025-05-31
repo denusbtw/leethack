@@ -40,7 +40,7 @@ class TestMyParticipationRequestListAPIView:
         api_client.force_authenticate(user=user)
         response = api_client.get(my_participation_request_list_url)
         assert response.status_code == status.HTTP_200_OK
-        assert len(response.data) == 2
+        assert response.data["count"] == 2
 
     class TestPermissions:
 
@@ -165,7 +165,7 @@ class TestMyParticipationListAPIView:
         api_client.force_authenticate(user=user)
         response = api_client.get(my_participation_list_url)
         assert response.status_code == status.HTTP_200_OK
-        assert len(response.data) == 2
+        assert response.data["count"] == 2
 
     class TestPermissions:
 

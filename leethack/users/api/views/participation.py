@@ -7,6 +7,7 @@ from leethack.users.api.serializers import (
     MyParticipationRequestRetrieveSerializer,
     MyParticipationListSerializer,
 )
+from .pagination import MyParticipationRequestPagination, MyParticipationPagination
 
 
 class MyParticipationRequestListAPIView(generics.ListAPIView):
@@ -16,6 +17,7 @@ class MyParticipationRequestListAPIView(generics.ListAPIView):
 
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = MyParticipationRequestListSerializer
+    pagination_class = MyParticipationRequestPagination
     filter_backends = (filters.OrderingFilter, filters.SearchFilter)
     search_fields = ("hackathon__title",)
     ordering_fields = ("created_at",)
@@ -49,6 +51,7 @@ class MyParticipationListAPIView(generics.ListAPIView):
 
     serializer_class = MyParticipationListSerializer
     permission_classes = [permissions.IsAuthenticated]
+    pagination_class = MyParticipationPagination
     filter_backends = (filters.OrderingFilter, filters.SearchFilter)
     search_fields = ("hackathon__title",)
     ordering_fields = ("created_at",)

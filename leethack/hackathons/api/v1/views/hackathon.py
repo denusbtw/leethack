@@ -8,6 +8,7 @@ from ..serializers import (
     HackathonRetrieveSerializer,
     HackathonUpdateSerializer,
 )
+from .pagination import HackathonPagination
 from leethack.hackathons.models import Hackathon
 from leethack.users.api.permissions import IsHost
 
@@ -19,7 +20,7 @@ class HackathonListCreateAPIView(generics.ListCreateAPIView):
 
     queryset = Hackathon.objects.all()
     permission_classes = [ReadOnly | permissions.IsAdminUser | IsHost]
-    # TODO: add pagination class
+    pagination_class = HackathonPagination
     filter_backends = (filters.OrderingFilter, filters.SearchFilter)
     # TODO: move search in description in SearchVector
     search_fields = ("title", "description")

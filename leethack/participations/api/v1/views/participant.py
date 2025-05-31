@@ -6,6 +6,7 @@ from ..serializers import (
     HackathonParticipantListSerializer,
     HackathonParticipantDetailSerializer,
 )
+from .pagination import HackathonParticipantPagination
 from leethack.participations.models import Participant
 
 
@@ -16,6 +17,7 @@ class HackathonParticipantListAPIView(generics.ListAPIView):
 
     serializer_class = HackathonParticipantListSerializer
     permission_classes = [permissions.IsAdminUser | IsHackathonHost]
+    pagination_class = HackathonParticipantPagination
     filter_backends = (filters.OrderingFilter, filters.SearchFilter)
     search_fields = (
         "user__username",

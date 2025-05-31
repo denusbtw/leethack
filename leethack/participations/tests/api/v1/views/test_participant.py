@@ -37,7 +37,7 @@ class TestHackathonParticipantListAPIView:
         api_client.force_authenticate(user=admin_user)
         response = api_client.get(list_url)
         assert response.status_code == status.HTTP_200_OK
-        assert len(response.data) == 2
+        assert response.data["count"] == 2
 
     class TestPermissions:
 

@@ -2,6 +2,11 @@ from rest_framework import generics, permissions, filters
 
 from leethack.hackathons.api.v1.serializers import HackathonListSerializer
 from leethack.hackathons.models import Hackathon
+from .pagination import (
+    MyParticipatedHackathonPagination,
+    MyHostedHackathonPagination,
+    UserHostedHackathonPagination,
+)
 
 
 class MyParticipatedHackathonListAPIView(generics.ListAPIView):
@@ -11,6 +16,7 @@ class MyParticipatedHackathonListAPIView(generics.ListAPIView):
 
     serializer_class = HackathonListSerializer
     permission_classes = [permissions.IsAuthenticated]
+    pagination_class = MyParticipatedHackathonPagination
     filter_backends = (filters.OrderingFilter, filters.SearchFilter)
     # TODO: move search by description to SearchVector
     search_fields = ("title", "description")
@@ -28,6 +34,7 @@ class MyHostedHackathonListAPIView(generics.ListAPIView):
 
     serializer_class = HackathonListSerializer
     permission_classes = [permissions.IsAuthenticated]
+    pagination_class = MyHostedHackathonPagination
     filter_backends = (filters.OrderingFilter, filters.SearchFilter)
     # TODO: move search by description to SearchVector
     search_fields = ("title", "description")
@@ -45,6 +52,7 @@ class UserHostedHackathonListAPIView(generics.ListAPIView):
 
     serializer_class = HackathonListSerializer
     permission_classes = [permissions.AllowAny]
+    pagination_class = UserHostedHackathonPagination
     filter_backends = (filters.OrderingFilter, filters.SearchFilter)
     # TODO: move search by description to SearchVector
     search_fields = ("title", "description")
