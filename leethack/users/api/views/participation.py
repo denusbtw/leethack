@@ -1,7 +1,7 @@
 from rest_framework import generics, permissions
+from rest_framework.exceptions import PermissionDenied
 
 from leethack.participations.models import ParticipationRequest, Participant
-from leethack.users.api.permissions import CanDeleteOwnParticipationRequest
 from leethack.users.api.serializers import (
     MyParticipationRequestListSerializer,
     MyParticipationRequestRetrieveSerializer,
@@ -26,9 +26,15 @@ class MyParticipationRequestDetailAPIView(generics.RetrieveDestroyAPIView):
     """
 
     serializer_class = MyParticipationRequestRetrieveSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         return ParticipationRequest.objects.filter(user=self.request.user)
+
+    def perform_destroy(self, instance):
+        if not instance.is_pending:
+            raise PermissionDenied("You can delete only pending requests.")
+        instance.delete()
 
 
 class MyParticipationListAPIView(generics.ListAPIView):
