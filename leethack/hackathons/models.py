@@ -50,6 +50,7 @@ class Hackathon(UUIDModel, TimestampedModel):
         blank=True,
         related_name="won_hackathons"
     )
+    # TODO: add `image` field
 
     class Meta:
         constraints = [

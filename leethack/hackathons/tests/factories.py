@@ -28,22 +28,18 @@ class HackathonFactory(factory.django.DjangoModelFactory):
 
     @factory.lazy_attribute
     def start_datetime(self):
-        now = timezone.now()
-        month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-        next_month = (month_start + timedelta(days=32)).replace(day=1)
-        return timezone.make_aware(
-            faker.date_time_between(month_start, next_month - timedelta(seconds=1))
+        return faker.date_time_between(
+            start_date=timezone.now(),
+            end_date=timezone.now() + timedelta(days=60),
+            tzinfo=timezone.get_current_timezone(),
         )
 
     @factory.lazy_attribute
     def end_datetime(self):
-        month_end = self.start_datetime.replace(day=28) + timedelta(days=4)
-        month_end = month_end.replace(day=1) - timedelta(seconds=1)
-        return timezone.make_aware(
-            faker.date_time_between(
-                start_date=self.start_datetime + timedelta(minutes=1),
-                end_date=month_end,
-            )
+        return faker.date_time_between(
+            start_date=self.start_datetime + timedelta(minutes=1),
+            end_date=self.start_datetime + timedelta(days=30),
+            tzinfo=timezone.get_current_timezone(),
         )
 
     @factory.lazy_attribute
