@@ -69,3 +69,8 @@ def participation_request_factory():
 @pytest.fixture
 def hackathon(hackathon_factory):
     return hackathon_factory()
+
+
+@pytest.fixture
+def participation_request(hackathon, participation_request_factory):
+    return participation_request_factory(hackathon=hackathon)

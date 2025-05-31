@@ -1,6 +1,7 @@
 from rest_framework import generics, permissions
 
-from leethack.core.api.permissions import ReadOnly
+from leethack.core.api.permissions import ReadOnly, PostOnly
+from leethack.hackathons.api.v1.permissions import IsHackathonHost
 from leethack.participations.api.v1.serializers import (
     HackathonParticipationRequestListSerializer,
     HackathonParticipationRequestCreateSerializer,
@@ -15,7 +16,10 @@ class HackathonParticipationRequestListCreateAPIView(generics.ListCreateAPIView)
     Returns participation requests of specific hackathon
     """
 
-    permission_classes = [ReadOnly | permissions.IsAuthenticated]
+    permission_classes = [
+        ReadOnly & (permissions.IsAdminUser | IsHackathonHost)
+        | (PostOnly & permissions.IsAuthenticated)
+    ]
 
     def get_queryset(self):
         hackathon_id = self.kwargs["hackathon_id"]
@@ -38,6 +42,8 @@ class HackathonParticipationRequestDetailAPIView(generics.RetrieveUpdateDestroyA
     """
     Returns participation request of specific hackathon
     """
+
+    permission_classes = [permissions.IsAdminUser | IsHackathonHost]
 
     def get_queryset(self):
         hackathon_id = self.kwargs["hackathon_id"]

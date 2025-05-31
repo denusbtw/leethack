@@ -19,7 +19,7 @@ class MyParticipationRequestRetrieveSerializer(serializers.Serializer):
     pass
 
 
-class MyParticipantListSerializer(serializers.Serializer):
+class MyParticipationListSerializer(serializers.Serializer):
     id = serializers.UUIDField()
     hackathon = HackathonNestedSerializer()
     created_at = serializers.DateTimeField()

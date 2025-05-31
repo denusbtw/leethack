@@ -1,13 +1,15 @@
 from rest_framework import generics, permissions
 
 from leethack.core.api.permissions import ReadOnly
-from leethack.hackathons.api.v1.serializers import (
+from ..permissions import IsHackathonHost
+from ..serializers import (
     HackathonListSerializer,
     HackathonCreateSerializer,
     HackathonRetrieveSerializer,
     HackathonUpdateSerializer,
 )
 from leethack.hackathons.models import Hackathon
+from leethack.users.api.permissions import IsHost
 
 
 class HackathonListCreateAPIView(generics.ListCreateAPIView):
@@ -16,7 +18,7 @@ class HackathonListCreateAPIView(generics.ListCreateAPIView):
     """
 
     queryset = Hackathon.objects.all()
-    permission_classes = [ReadOnly | permissions.IsAuthenticated]
+    permission_classes = [ReadOnly | permissions.IsAdminUser | IsHost]
 
     def get_serializer_class(self):
         if self.request.method == "GET":
@@ -33,6 +35,7 @@ class HackathonDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     """
 
     queryset = Hackathon.objects.all()
+    permission_classes = [ReadOnly | permissions.IsAdminUser | IsHackathonHost]
 
     def get_serializer_class(self):
         if self.request.method == "GET":

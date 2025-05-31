@@ -77,3 +77,5 @@ class ParticipationRequest(UUIDModel, TimestampedModel):
     @property
     def is_rejected(self):
         return self.status == self.Status.REJECTED
+
+    # TODO: add methods `approve`, `reject`, `pend`

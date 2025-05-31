@@ -32,6 +32,44 @@ class TestMyParticipatedHackathonListAPIView:
         assert response.status_code == status.HTTP_200_OK
         assert len(response.data) == 2
 
+    class TestPermissions:
+
+        @pytest.mark.parametrize(
+            "method, expected_status_code",
+            [
+                ("get", status.HTTP_403_FORBIDDEN),
+                ("post", status.HTTP_403_FORBIDDEN),
+            ],
+        )
+        def test_anonymous_user(
+            self,
+            api_client,
+            my_participated_hackathon_list_url,
+            method,
+            expected_status_code,
+        ):
+            response = getattr(api_client, method)(my_participated_hackathon_list_url)
+            assert response.status_code == expected_status_code
+
+        @pytest.mark.parametrize(
+            "method, expected_status_code",
+            [
+                ("get", status.HTTP_200_OK),
+                ("post", status.HTTP_405_METHOD_NOT_ALLOWED),
+            ],
+        )
+        def test_authenticated_user(
+            self,
+            api_client,
+            my_participated_hackathon_list_url,
+            user,
+            method,
+            expected_status_code,
+        ):
+            api_client.force_authenticate(user=user)
+            response = getattr(api_client, method)(my_participated_hackathon_list_url)
+            assert response.status_code == expected_status_code
+
 
 @pytest.mark.django_db
 class TestMyHostedHackathonListAPIView:
@@ -48,6 +86,44 @@ class TestMyHostedHackathonListAPIView:
         assert response.status_code == status.HTTP_200_OK
         assert len(response.data) == 2
 
+    class TestPermissions:
+
+        @pytest.mark.parametrize(
+            "method, expected_status_code",
+            [
+                ("get", status.HTTP_403_FORBIDDEN),
+                ("post", status.HTTP_403_FORBIDDEN),
+            ],
+        )
+        def test_anonymous_user(
+            self,
+            api_client,
+            my_hosted_hackathon_list_url,
+            method,
+            expected_status_code,
+        ):
+            response = getattr(api_client, method)(my_hosted_hackathon_list_url)
+            assert response.status_code == expected_status_code
+
+        @pytest.mark.parametrize(
+            "method, expected_status_code",
+            [
+                ("get", status.HTTP_200_OK),
+                ("post", status.HTTP_405_METHOD_NOT_ALLOWED),
+            ],
+        )
+        def test_authenticated_user(
+            self,
+            api_client,
+            my_hosted_hackathon_list_url,
+            user,
+            method,
+            expected_status_code,
+        ):
+            api_client.force_authenticate(user=user)
+            response = getattr(api_client, method)(my_hosted_hackathon_list_url)
+            assert response.status_code == expected_status_code
+
 
 @pytest.mark.django_db
 class TestUserHostedHackathonListAPIView:
@@ -61,3 +137,22 @@ class TestUserHostedHackathonListAPIView:
         response = api_client.get(user_hosted_hackathon_list)
         assert response.status_code == status.HTTP_200_OK
         assert len(response.data) == 2
+
+    class TestPermissions:
+
+        @pytest.mark.parametrize(
+            "method, expected_status_code",
+            [
+                ("get", status.HTTP_200_OK),
+                ("post", status.HTTP_405_METHOD_NOT_ALLOWED),
+            ],
+        )
+        def test_anonymous_user(
+            self,
+            api_client,
+            user_hosted_hackathon_list,
+            method,
+            expected_status_code,
+        ):
+            response = getattr(api_client, method)(user_hosted_hackathon_list)
+            assert response.status_code == expected_status_code

@@ -2,17 +2,13 @@ import pytest
 from django.urls import reverse
 from rest_framework import status
 
+from leethack.conftest import participation_request
 from leethack.participations.models import ParticipationRequest
 
 
 @pytest.fixture
 def my_participation_request_list_url():
     return reverse("api:v1:my_participation_request_list")
-
-
-@pytest.fixture
-def participation_request(participation_request_factory):
-    return participation_request_factory()
 
 
 @pytest.fixture
@@ -45,6 +41,44 @@ class TestMyParticipationRequestListAPIView:
         response = api_client.get(my_participation_request_list_url)
         assert response.status_code == status.HTTP_200_OK
         assert len(response.data) == 2
+
+    class TestPermissions:
+
+        @pytest.mark.parametrize(
+            "method, expected_status_code",
+            [
+                ("get", status.HTTP_403_FORBIDDEN),
+                ("post", status.HTTP_403_FORBIDDEN),
+            ],
+        )
+        def test_anonymous_user(
+            self,
+            api_client,
+            my_participation_request_list_url,
+            method,
+            expected_status_code,
+        ):
+            response = getattr(api_client, method)(my_participation_request_list_url)
+            assert response.status_code == expected_status_code
+
+        @pytest.mark.parametrize(
+            "method, expected_status_code",
+            [
+                ("get", status.HTTP_200_OK),
+                ("post", status.HTTP_405_METHOD_NOT_ALLOWED),
+            ],
+        )
+        def test_authenticated_user(
+            self,
+            api_client,
+            my_participation_request_list_url,
+            user,
+            method,
+            expected_status_code,
+        ):
+            api_client.force_authenticate(user=user)
+            response = getattr(api_client, method)(my_participation_request_list_url)
+            assert response.status_code == expected_status_code
 
 
 @pytest.mark.django_db
@@ -132,3 +166,37 @@ class TestMyParticipationListAPIView:
         response = api_client.get(my_participation_list_url)
         assert response.status_code == status.HTTP_200_OK
         assert len(response.data) == 2
+
+    class TestPermissions:
+
+        @pytest.mark.parametrize(
+            "method, expected_status_code",
+            [
+                ("get", status.HTTP_403_FORBIDDEN),
+                ("post", status.HTTP_403_FORBIDDEN),
+            ],
+        )
+        def test_anonymous_user(
+            self, api_client, my_participation_list_url, method, expected_status_code
+        ):
+            response = getattr(api_client, method)(my_participation_list_url)
+            assert response.status_code == expected_status_code
+
+        @pytest.mark.parametrize(
+            "method, expected_status_code",
+            [
+                ("get", status.HTTP_200_OK),
+                ("post", status.HTTP_405_METHOD_NOT_ALLOWED),
+            ],
+        )
+        def test_authenticated_user(
+            self,
+            api_client,
+            my_participation_list_url,
+            user,
+            method,
+            expected_status_code,
+        ):
+            api_client.force_authenticate(user=user)
+            response = getattr(api_client, method)(my_participation_list_url)
+            assert response.status_code == expected_status_code

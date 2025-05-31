@@ -22,6 +22,7 @@ class MyHostedHackathonListAPIView(generics.ListAPIView):
     """
 
     serializer_class = HackathonListSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         return Hackathon.objects.filter(host=self.request.user)
@@ -33,6 +34,7 @@ class UserHostedHackathonListAPIView(generics.ListAPIView):
     """
 
     serializer_class = HackathonListSerializer
+    permission_classes = [permissions.AllowAny]
 
     def get_queryset(self):
         user_id = self.kwargs["user_id"]

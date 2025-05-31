@@ -1,6 +1,6 @@
 from .user import UserNestedSerializer, MeRetrieveSerializer
 from .participation import (
-    MyParticipantListSerializer,
+    MyParticipationListSerializer,
     MyParticipationRequestListSerializer,
     MyParticipationRequestRetrieveSerializer,
 )
