@@ -28,7 +28,9 @@ class HackathonParticipationRequestListCreateAPIView(generics.ListCreateAPIView)
 
     def perform_create(self, serializer):
         serializer.save(
-            user=self.request.user, hackathon_id=self.kwargs["hackathon_id"]
+            user=self.request.user,
+            hackathon_id=self.kwargs["hackathon_id"],
+            status=ParticipationRequest.Status.PENDING,
         )
 
 

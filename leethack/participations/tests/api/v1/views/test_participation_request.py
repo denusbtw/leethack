@@ -26,7 +26,7 @@ class TestHackathonParticipationRequestListCreateAPIView:
         assert response.status_code == status.HTTP_200_OK
         assert len(response.data) == 2
 
-    def test_perform_create_sets_user_and_hackathon(
+    def test_perform_create_pending_request_and_sets_user_and_hackathon(
         self, api_client, list_url, hackathon, user
     ):
         api_client.force_authenticate(user=user)
@@ -36,3 +36,4 @@ class TestHackathonParticipationRequestListCreateAPIView:
         participation_request = ParticipationRequest.objects.get(pk=response.data["id"])
         assert participation_request.user == user
         assert participation_request.hackathon == hackathon
+        assert participation_request.status == ParticipationRequest.Status.PENDING
