@@ -41,3 +41,6 @@ class HackathonDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
         if self.request.method == "GET":
             return HackathonRetrieveSerializer
         return HackathonUpdateSerializer
+
+    def get_hackathon_id(self):
+        return self.kwargs["pk"]

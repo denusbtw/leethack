@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.db import models
+from django.db import models, transaction
 from django.utils.translation import gettext_lazy as _
 
 from leethack.core.models import UUIDModel, TimestampedModel
@@ -78,4 +78,24 @@ class ParticipationRequest(UUIDModel, TimestampedModel):
     def is_rejected(self):
         return self.status == self.Status.REJECTED
 
-    # TODO: add methods `approve`, `reject`, `pend`
+    @transaction.atomic
+    def approve(self):
+        if self.is_approved:
+            return
+
+        self.status = self.Status.APPROVED
+        self.save()
+        Participant.objects.create(user=self.user, hackathon=self.hackathon)
+
+    @transaction.atomic
+    def reject(self):
+        if self.is_rejected:
+            return
+
+        if self.is_approved:
+            Participant.objects.filter(
+                user=self.user, hackathon=self.hackathon
+            ).delete()
+
+        self.status = self.Status.REJECTED
+        self.save()

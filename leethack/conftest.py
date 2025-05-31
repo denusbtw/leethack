@@ -7,6 +7,7 @@ from django.contrib.auth import get_user_model
 from rest_framework.test import APIClient
 
 from leethack.hackathons.tests.factories import CategoryFactory, HackathonFactory
+from leethack.participations.models import ParticipationRequest
 from leethack.participations.tests.factories import (
     ParticipantFactory,
     ParticipationRequestFactory,
@@ -74,3 +75,24 @@ def hackathon(hackathon_factory):
 @pytest.fixture
 def participation_request(hackathon, participation_request_factory):
     return participation_request_factory(hackathon=hackathon)
+
+
+@pytest.fixture
+def approved_participation_request(hackathon, participation_request_factory):
+    return participation_request_factory(
+        status=ParticipationRequest.Status.APPROVED, hackathon=hackathon
+    )
+
+
+@pytest.fixture
+def pending_participation_request(hackathon, participation_request_factory):
+    return participation_request_factory(
+        status=ParticipationRequest.Status.PENDING, hackathon=hackathon
+    )
+
+
+@pytest.fixture
+def rejected_participation_request(hackathon, participation_request_factory):
+    return participation_request_factory(
+        status=ParticipationRequest.Status.REJECTED, hackathon=hackathon
+    )

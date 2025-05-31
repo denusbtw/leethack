@@ -24,6 +24,11 @@ def detail_url(participation_request):
     )
 
 
+@pytest.fixture
+def data():
+    return {"status": ParticipationRequest.Status.APPROVED}
+
+
 @pytest.mark.django_db
 class TestHackathonParticipationRequestListCreateAPIView:
 
@@ -184,10 +189,10 @@ class TestHackathonParticipationRequestDetailAPIView:
             ],
         )
         def test_hackathon_host(
-            self, api_client, detail_url, hackathon, method, expected_status_code
+            self, api_client, detail_url, hackathon, data, method, expected_status_code
         ):
             api_client.force_authenticate(user=hackathon.host)
-            response = getattr(api_client, method)(detail_url)
+            response = getattr(api_client, method)(detail_url, data=data)
             assert response.status_code == expected_status_code
 
         @pytest.mark.parametrize(
@@ -200,8 +205,8 @@ class TestHackathonParticipationRequestDetailAPIView:
             ],
         )
         def test_admin_user(
-            self, api_client, detail_url, hackathon, method, expected_status_code
+            self, api_client, detail_url, hackathon, data, method, expected_status_code
         ):
             api_client.force_authenticate(user=hackathon.host)
-            response = getattr(api_client, method)(detail_url)
+            response = getattr(api_client, method)(detail_url, data=data)
             assert response.status_code == expected_status_code
