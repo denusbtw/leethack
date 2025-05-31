@@ -1,4 +1,4 @@
-from rest_framework import generics, permissions
+from rest_framework import generics, permissions, filters
 
 from leethack.core.api.permissions import ReadOnly
 from ..permissions import IsHackathonHost
@@ -19,6 +19,13 @@ class HackathonListCreateAPIView(generics.ListCreateAPIView):
 
     queryset = Hackathon.objects.all()
     permission_classes = [ReadOnly | permissions.IsAdminUser | IsHost]
+    # TODO: add pagination class
+    filter_backends = (filters.OrderingFilter, filters.SearchFilter)
+    # TODO: move search in description in SearchVector
+    search_fields = ("title", "description")
+    ordering_fields = ("start_datetime", "end_datetime", "prize")
+    ordering = ["start_datetime"]
+    # TODO: create HackathonFilterSet
 
     def get_serializer_class(self):
         if self.request.method == "GET":

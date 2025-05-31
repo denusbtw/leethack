@@ -1,4 +1,4 @@
-from rest_framework import generics, permissions
+from rest_framework import generics, permissions, filters
 
 from leethack.core.api.permissions import ReadOnly, PostOnly
 from leethack.hackathons.api.v1.permissions import IsHackathonHost
@@ -20,6 +20,15 @@ class HackathonParticipationRequestListCreateAPIView(generics.ListCreateAPIView)
         ReadOnly & (permissions.IsAdminUser | IsHackathonHost)
         | (PostOnly & permissions.IsAuthenticated)
     ]
+    filter_backends = (filters.OrderingFilter, filters.SearchFilter)
+    search_fields = (
+        "user__username",
+        "user__email",
+        "user__first_name",
+        "user__last_name",
+    )
+    ordering_fields = ("created_at",)
+    ordering = ("-created_at",)
 
     def get_queryset(self):
         hackathon_id = self.kwargs["hackathon_id"]

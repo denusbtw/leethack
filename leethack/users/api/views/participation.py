@@ -1,4 +1,4 @@
-from rest_framework import generics, permissions
+from rest_framework import generics, permissions, filters
 from rest_framework.exceptions import PermissionDenied
 
 from leethack.participations.models import ParticipationRequest, Participant
@@ -16,6 +16,10 @@ class MyParticipationRequestListAPIView(generics.ListAPIView):
 
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = MyParticipationRequestListSerializer
+    filter_backends = (filters.OrderingFilter, filters.SearchFilter)
+    search_fields = ("hackathon__title",)
+    ordering_fields = ("created_at",)
+    ordering = ("-created_at",)
 
     def get_queryset(self):
         return ParticipationRequest.objects.filter(user=self.request.user)
@@ -45,6 +49,10 @@ class MyParticipationListAPIView(generics.ListAPIView):
 
     serializer_class = MyParticipationListSerializer
     permission_classes = [permissions.IsAuthenticated]
+    filter_backends = (filters.OrderingFilter, filters.SearchFilter)
+    search_fields = ("hackathon__title",)
+    ordering_fields = ("created_at",)
+    ordering = ("-created_at",)
 
     def get_queryset(self):
         return Participant.objects.filter(user=self.request.user)
