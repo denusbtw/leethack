@@ -62,3 +62,21 @@ class HackathonUpdateSerializer(serializers.ModelSerializer):
             "start_datetime": {"required": False},
             "end_datetime": {"required": False},
         }
+
+    def validate(self, attrs):
+        winner = attrs.get("winner")
+
+        if winner and self.instance.is_active:
+            raise serializers.ValidationError(
+                {"winner": "Cannot set winner while hackathon is active."}
+            )
+
+        if winner:
+            if not winner.hackathon == self.instance:
+                raise serializers.ValidationError(
+                    {
+                        "winner": "Selected participant is not a participant of this hackathon."
+                    }
+                )
+
+        return attrs
