@@ -11,11 +11,13 @@ class BaseMyParticipationRequestReadSerializer(serializers.Serializer):
     updated_at = serializers.DateTimeField()
 
 
-class MyParticipationRequestListSerializer(serializers.Serializer):
+class MyParticipationRequestListSerializer(BaseMyParticipationRequestReadSerializer):
     pass
 
 
-class MyParticipationRequestRetrieveSerializer(serializers.Serializer):
+class MyParticipationRequestRetrieveSerializer(
+    BaseMyParticipationRequestReadSerializer
+):
     pass
 
 

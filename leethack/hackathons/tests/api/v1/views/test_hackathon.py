@@ -1,5 +1,8 @@
+import datetime
+
 import pytest
 from django.urls import reverse
+from django.utils import timezone
 from rest_framework import status
 
 from leethack.hackathons.models import Hackathon
@@ -81,6 +84,93 @@ class TestHackathonListCreateAPIView:
 
         hackathon = Hackathon.objects.get(pk=response.data["id"])
         assert hackathon.host == host
+
+    class TestFilter:
+
+        def test_by_category_slug(
+            self, api_client, list_url, category_factory, hackathon_factory
+        ):
+            web_development = category_factory(title="Web Development")
+            ai = category_factory(title="AI")
+            web_hackathon = hackathon_factory(category=web_development)
+            ai_hackathon = hackathon_factory(category=ai)
+
+            response = api_client.get(list_url, {"category": ai.slug})
+            assert response.status_code == status.HTTP_200_OK
+            assert {h["id"] for h in response.data["results"]} == {str(ai_hackathon.id)}
+
+        @pytest.mark.parametrize("param", ["active", "past", "dasjirq"])
+        def test_by_hackathon_status(
+            self, api_client, list_url, hackathon_factory, past_date, future_date, param
+        ):
+            now = timezone.now()
+            active_hackathon = hackathon_factory(
+                start_datetime=past_date, end_datetime=future_date
+            )
+            past_hackathon = hackathon_factory(
+                start_datetime=past_date, end_datetime=timezone.now()
+            )
+
+            expected_ids = {
+                "active": {str(active_hackathon.id)},
+                "past": {str(past_hackathon.id)},
+            }.get(param, {str(active_hackathon.id), str(past_hackathon.id)})
+
+            response = api_client.get(list_url, {"hackathon_status": param})
+            assert response.status_code == status.HTTP_200_OK
+            assert {h["id"] for h in response.data["results"]} == expected_ids
+
+        def test_by_start_after(self, api_client, list_url, hackathon_factory):
+            hackathon1 = hackathon_factory(
+                start_datetime=timezone.make_aware(datetime.datetime(2025, 1, 1)),
+                end_datetime=timezone.make_aware(datetime.datetime(2025, 1, 9)),
+            )
+            hackathon2 = hackathon_factory(
+                start_datetime=timezone.make_aware(datetime.datetime(2025, 3, 2)),
+                end_datetime=timezone.make_aware(datetime.datetime(2025, 3, 13)),
+            )
+
+            query_params = {
+                "start_after": timezone.make_aware(datetime.datetime(2025, 2, 8))
+            }
+            response = api_client.get(list_url, query_params)
+            assert response.status_code == status.HTTP_200_OK
+            assert {h["id"] for h in response.data["results"]} == {str(hackathon2.id)}
+
+        def test_by_end_before(self, api_client, list_url, hackathon_factory):
+            hackathon1 = hackathon_factory(
+                start_datetime=timezone.make_aware(datetime.datetime(2025, 1, 1)),
+                end_datetime=timezone.make_aware(datetime.datetime(2025, 1, 9)),
+            )
+            hackathon2 = hackathon_factory(
+                start_datetime=timezone.make_aware(datetime.datetime(2025, 3, 2)),
+                end_datetime=timezone.make_aware(datetime.datetime(2025, 3, 13)),
+            )
+
+            query_params = {
+                "end_before": timezone.make_aware(datetime.datetime(2025, 2, 8))
+            }
+            response = api_client.get(list_url, query_params)
+            assert response.status_code == status.HTTP_200_OK
+            assert {h["id"] for h in response.data["results"]} == {str(hackathon1.id)}
+
+        def test_by_winner(
+            self,
+            api_client,
+            list_url,
+            hackathon_factory,
+            participant_factory,
+            john,
+            alice,
+        ):
+            john_hackathon = hackathon_factory(winner=participant_factory(user=john))
+            alice_hackathon = hackathon_factory(winner=participant_factory(user=alice))
+
+            response = api_client.get(list_url, {"winner": "john"})
+            assert response.status_code == status.HTTP_200_OK
+            assert {h["id"] for h in response.data["results"]} == {
+                str(john_hackathon.id)
+            }
 
 
 @pytest.mark.django_db

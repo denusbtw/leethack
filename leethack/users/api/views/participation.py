@@ -1,6 +1,8 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, permissions, filters
 from rest_framework.exceptions import PermissionDenied
 
+from leethack.participations.api.v1.filters import ParticipationRequestFilterSet
 from leethack.participations.models import ParticipationRequest, Participant
 from leethack.users.api.serializers import (
     MyParticipationRequestListSerializer,
@@ -18,7 +20,12 @@ class MyParticipationRequestListAPIView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = MyParticipationRequestListSerializer
     pagination_class = MyParticipationRequestPagination
-    filter_backends = (filters.OrderingFilter, filters.SearchFilter)
+    filter_backends = (
+        DjangoFilterBackend,
+        filters.OrderingFilter,
+        filters.SearchFilter,
+    )
+    filterset_class = ParticipationRequestFilterSet
     search_fields = ("hackathon__title",)
     ordering_fields = ("created_at",)
     ordering = ("-created_at",)

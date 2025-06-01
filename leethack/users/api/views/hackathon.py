@@ -1,5 +1,7 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, permissions, filters
 
+from leethack.hackathons.api.v1.filters import HackathonFilterSet
 from leethack.hackathons.api.v1.serializers import HackathonListSerializer
 from leethack.hackathons.models import Hackathon
 from .pagination import (
@@ -17,7 +19,12 @@ class MyParticipatedHackathonListAPIView(generics.ListAPIView):
     serializer_class = HackathonListSerializer
     permission_classes = [permissions.IsAuthenticated]
     pagination_class = MyParticipatedHackathonPagination
-    filter_backends = (filters.OrderingFilter, filters.SearchFilter)
+    filter_backends = (
+        DjangoFilterBackend,
+        filters.OrderingFilter,
+        filters.SearchFilter,
+    )
+    filterset_class = HackathonFilterSet
     # TODO: move search by description to SearchVector
     search_fields = ("title", "description")
     ordering_fields = ("start_datetime", "end_datetime", "prize")
@@ -35,7 +42,12 @@ class MyHostedHackathonListAPIView(generics.ListAPIView):
     serializer_class = HackathonListSerializer
     permission_classes = [permissions.IsAuthenticated]
     pagination_class = MyHostedHackathonPagination
-    filter_backends = (filters.OrderingFilter, filters.SearchFilter)
+    filter_backends = (
+        DjangoFilterBackend,
+        filters.OrderingFilter,
+        filters.SearchFilter,
+    )
+    filterset_class = HackathonFilterSet
     # TODO: move search by description to SearchVector
     search_fields = ("title", "description")
     ordering_fields = ("start_datetime", "end_datetime", "prize")
@@ -53,7 +65,12 @@ class UserHostedHackathonListAPIView(generics.ListAPIView):
     serializer_class = HackathonListSerializer
     permission_classes = [permissions.AllowAny]
     pagination_class = UserHostedHackathonPagination
-    filter_backends = (filters.OrderingFilter, filters.SearchFilter)
+    filter_backends = (
+        DjangoFilterBackend,
+        filters.OrderingFilter,
+        filters.SearchFilter,
+    )
+    filterset_class = HackathonFilterSet
     # TODO: move search by description to SearchVector
     search_fields = ("title", "description")
     ordering_fields = ("start_datetime", "end_datetime", "prize")

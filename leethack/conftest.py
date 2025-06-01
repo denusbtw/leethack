@@ -96,3 +96,13 @@ def rejected_participation_request(hackathon, participation_request_factory):
     return participation_request_factory(
         status=ParticipationRequest.Status.REJECTED, hackathon=hackathon
     )
+
+
+@pytest.fixture
+def john(user_factory):
+    return user_factory(username="john", email="john@email.com")
+
+
+@pytest.fixture
+def alice(user_factory):
+    return user_factory(username="alice", email="alice@email.com")

@@ -126,6 +126,25 @@ class TestHackathonParticipationRequestListCreateAPIView:
             response = getattr(api_client, method)(list_url)
             assert response.status_code == expected_status_code
 
+    class TestFilter:
+
+        def test_by_status(
+            self,
+            api_client,
+            list_url,
+            admin_user,
+            approved_participation_request,
+            pending_participation_request,
+            rejected_participation_request,
+        ):
+            api_client.force_authenticate(user=admin_user)
+            query_params = {"status": ParticipationRequest.Status.APPROVED}
+            response = api_client.get(list_url, query_params)
+            assert response.status_code == status.HTTP_200_OK
+            assert {h["id"] for h in response.data["results"]} == {
+                str(approved_participation_request.id)
+            }
+
 
 @pytest.mark.django_db
 class TestHackathonParticipationRequestDetailAPIView:

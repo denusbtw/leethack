@@ -1,8 +1,10 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, permissions, filters
 
 from leethack.core.api.permissions import ReadOnly, PostOnly
 from leethack.hackathons.api.v1.permissions import IsHackathonHost
 from .pagination import HackathonParticipationRequestPagination
+from ..filters import ParticipationRequestFilterSet
 from ..serializers import (
     HackathonParticipationRequestListSerializer,
     HackathonParticipationRequestCreateSerializer,
@@ -22,7 +24,12 @@ class HackathonParticipationRequestListCreateAPIView(generics.ListCreateAPIView)
         | (PostOnly & permissions.IsAuthenticated)
     ]
     pagination_class = HackathonParticipationRequestPagination
-    filter_backends = (filters.OrderingFilter, filters.SearchFilter)
+    filter_backends = (
+        DjangoFilterBackend,
+        filters.OrderingFilter,
+        filters.SearchFilter,
+    )
+    filterset_class = ParticipationRequestFilterSet
     search_fields = (
         "user__username",
         "user__email",
