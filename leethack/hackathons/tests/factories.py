@@ -3,12 +3,13 @@ from datetime import timedelta
 import factory
 from faker import Faker
 from django.utils import timezone
+from django.contrib.auth import get_user_model
 
 from leethack.users.tests.factories import UserFactory
 
 from ..models import Hackathon, Category
 
-
+User = get_user_model()
 faker = Faker()
 
 
@@ -20,7 +21,7 @@ class CategoryFactory(factory.django.DjangoModelFactory):
 
 
 class HackathonFactory(factory.django.DjangoModelFactory):
-    host = factory.SubFactory(UserFactory)
+    host = factory.SubFactory(UserFactory, role=User.Role.HOST)
     title = factory.Faker("sentence", nb_words=3)
     description = factory.Faker("paragraph", nb_sentences=3)
     category = factory.SubFactory(CategoryFactory)
@@ -42,13 +43,22 @@ class HackathonFactory(factory.django.DjangoModelFactory):
             tzinfo=timezone.get_current_timezone(),
         )
 
-    @factory.lazy_attribute
-    def winner(self):
+    @factory.post_generation
+    def winner(self, create, extracted, *args, **kwargs):
+        if not create:
+            return
+
         from leethack.participations.tests.factories import ParticipantFactory
 
+        if extracted:
+            self.winner = extracted
+            self.save()
+            return
+
         if timezone.now() > self.end_datetime:
-            return ParticipantFactory()
-        return None
+            self.winner = ParticipantFactory(hackathon=self)
+            self.save()
 
     class Meta:
         model = Hackathon
+        skip_postgeneration_save = True
