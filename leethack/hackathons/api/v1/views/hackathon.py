@@ -22,7 +22,7 @@ class HackathonListCreateAPIView(HackathonFilterMixin, generics.ListCreateAPIVie
     queryset = Hackathon.objects.all()
     permission_classes = [ReadOnly | permissions.IsAdminUser | IsHost]
     pagination_class = HackathonPagination
-    ordering = ["start_datetime"]
+    ordering = ("start_datetime",)
 
     def get_serializer_class(self):
         if self.request.method == "GET":

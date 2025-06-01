@@ -14,3 +14,4 @@ class HackathonFilterMixin:
     # TODO: move search in description in SearchVector
     search_fields = ("title", "description")
     ordering_fields = ("start_datetime", "end_datetime", "prize")
+    ordering = ("-end_datetime",)

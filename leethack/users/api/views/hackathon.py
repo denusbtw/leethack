@@ -18,7 +18,6 @@ class MyParticipatedHackathonListAPIView(HackathonFilterMixin, generics.ListAPIV
     serializer_class = HackathonListSerializer
     permission_classes = [permissions.IsAuthenticated]
     pagination_class = MyParticipatedHackathonPagination
-    ordering = ("-end_datetime",)
 
     def get_queryset(self):
         return Hackathon.objects.filter(participants__user=self.request.user)
@@ -32,7 +31,6 @@ class MyHostedHackathonListAPIView(HackathonFilterMixin, generics.ListAPIView):
     serializer_class = HackathonListSerializer
     permission_classes = [permissions.IsAuthenticated]
     pagination_class = MyHostedHackathonPagination
-    ordering = ("-end_datetime",)
 
     def get_queryset(self):
         return Hackathon.objects.filter(host=self.request.user)
@@ -46,7 +44,6 @@ class UserHostedHackathonListAPIView(HackathonFilterMixin, generics.ListAPIView)
     serializer_class = HackathonListSerializer
     permission_classes = [permissions.AllowAny]
     pagination_class = UserHostedHackathonPagination
-    ordering = ("-end_datetime",)
 
     def get_queryset(self):
         user_id = self.kwargs["user_id"]
