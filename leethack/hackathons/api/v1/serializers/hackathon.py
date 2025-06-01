@@ -18,6 +18,7 @@ class BaseHackathonReadSerializer(serializers.Serializer):
     start_datetime = serializers.DateTimeField()
     end_datetime = serializers.DateTimeField()
     winner = ParticipantNestedSerializer()
+    image = serializers.ImageField()
 
 
 class HackathonListSerializer(BaseHackathonReadSerializer):
@@ -39,6 +40,7 @@ class HackathonCreateSerializer(serializers.ModelSerializer):
             "prize",
             "start_datetime",
             "end_datetime",
+            "image",
         )
 
 
@@ -53,6 +55,7 @@ class HackathonUpdateSerializer(serializers.ModelSerializer):
             "start_datetime",
             "end_datetime",
             "winner",
+            "image",
         )
         extra_kwargs = {
             "title": {"required": False},
@@ -61,6 +64,7 @@ class HackathonUpdateSerializer(serializers.ModelSerializer):
             "prize": {"required": False},
             "start_datetime": {"required": False},
             "end_datetime": {"required": False},
+            "image": {"required": False},
         }
 
     def validate(self, attrs):

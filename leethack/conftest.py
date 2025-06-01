@@ -1,6 +1,9 @@
 import datetime
+from io import BytesIO
 
 import pytest
+from PIL import Image
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.utils import timezone
 from django.contrib.auth import get_user_model
 
@@ -106,3 +109,22 @@ def john(user_factory):
 @pytest.fixture
 def alice(user_factory):
     return user_factory(username="alice", email="alice@email.com")
+
+
+@pytest.fixture
+def image_file():
+    buffer = BytesIO()
+    image = Image.new("RGB", (100, 100), color="red")
+    image.save(buffer, format="JPEG")
+    buffer.seek(0)
+
+    return SimpleUploadedFile(
+        name="test.jpg",
+        content=buffer.read(),
+        content_type="image/jpeg",
+    )
+
+
+@pytest.fixture(autouse=True)
+def _media_storage(settings, tmpdir) -> None:
+    settings.MEDIA_ROOT = tmpdir.strpath

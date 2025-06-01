@@ -19,7 +19,7 @@ def detail_url(hackathon):
 
 
 @pytest.fixture
-def data(category_factory, past_date, future_date):
+def data(category_factory, past_date, future_date, image_file):
     category = category_factory()
     return {
         "title": "test hackathon",
@@ -28,6 +28,7 @@ def data(category_factory, past_date, future_date):
         "prize": 1000,
         "start_datetime": past_date,
         "end_datetime": future_date,
+        "image": image_file,
     }
 
 

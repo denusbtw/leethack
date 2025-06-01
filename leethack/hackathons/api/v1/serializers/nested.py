@@ -11,3 +11,4 @@ class HackathonNestedSerializer(serializers.Serializer):
     id = serializers.UUIDField()
     title = serializers.CharField()
     category = CategoryNestedSerializer()
+    image = serializers.ImageField()

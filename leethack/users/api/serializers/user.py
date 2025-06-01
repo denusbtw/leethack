@@ -9,6 +9,7 @@ class UserNestedSerializer(serializers.Serializer):
     id = serializers.UUIDField()
     username = serializers.CharField()
     email = serializers.EmailField()
+    profile_picture = serializers.ImageField()
 
 
 class MeRetrieveSerializer(serializers.Serializer):
@@ -17,12 +18,22 @@ class MeRetrieveSerializer(serializers.Serializer):
     email = serializers.EmailField()
     first_name = serializers.CharField()
     last_name = serializers.CharField()
+    profile_picture = serializers.ImageField()
+    profile_background = serializers.ImageField()
 
 
 class MeUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ("username", "email", "first_name", "last_name", "password")
+        fields = (
+            "username",
+            "email",
+            "first_name",
+            "last_name",
+            "password",
+            "profile_picture",
+            "profile_background",
+        )
         extra_kwargs = {
             "email": {"required": False},
             "password": {"required": False},
