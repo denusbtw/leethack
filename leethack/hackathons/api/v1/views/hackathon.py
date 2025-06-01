@@ -1,8 +1,7 @@
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import generics, permissions, filters
+from rest_framework import generics, permissions
 
 from leethack.core.api.permissions import ReadOnly
-from ..filters import HackathonFilterSet
+from .mixins import HackathonFilterMixin
 from ..permissions import IsHackathonHost
 from ..serializers import (
     HackathonListSerializer,
@@ -15,7 +14,7 @@ from leethack.hackathons.models import Hackathon
 from leethack.users.api.permissions import IsHost
 
 
-class HackathonListCreateAPIView(generics.ListCreateAPIView):
+class HackathonListCreateAPIView(HackathonFilterMixin, generics.ListCreateAPIView):
     """
     Returns list of all hackathons
     """
@@ -23,16 +22,6 @@ class HackathonListCreateAPIView(generics.ListCreateAPIView):
     queryset = Hackathon.objects.all()
     permission_classes = [ReadOnly | permissions.IsAdminUser | IsHost]
     pagination_class = HackathonPagination
-    # TODO: move filter_backends, filterset_class, search_fields, ordering_fields in HackathonFilterMixin
-    filter_backends = (
-        DjangoFilterBackend,
-        filters.OrderingFilter,
-        filters.SearchFilter,
-    )
-    filterset_class = HackathonFilterSet
-    # TODO: move search in description in SearchVector
-    search_fields = ("title", "description")
-    ordering_fields = ("start_datetime", "end_datetime", "prize")
     ordering = ["start_datetime"]
 
     def get_serializer_class(self):

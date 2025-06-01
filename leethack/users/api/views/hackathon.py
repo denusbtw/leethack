@@ -1,8 +1,7 @@
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import generics, permissions, filters
+from rest_framework import generics, permissions
 
-from leethack.hackathons.api.v1.filters import HackathonFilterSet
 from leethack.hackathons.api.v1.serializers import HackathonListSerializer
+from leethack.hackathons.api.v1.views.mixins import HackathonFilterMixin
 from leethack.hackathons.models import Hackathon
 from .pagination import (
     MyParticipatedHackathonPagination,
@@ -11,7 +10,7 @@ from .pagination import (
 )
 
 
-class MyParticipatedHackathonListAPIView(generics.ListAPIView):
+class MyParticipatedHackathonListAPIView(HackathonFilterMixin, generics.ListAPIView):
     """
     Returns list of hackathons where current user is participant
     """
@@ -19,22 +18,13 @@ class MyParticipatedHackathonListAPIView(generics.ListAPIView):
     serializer_class = HackathonListSerializer
     permission_classes = [permissions.IsAuthenticated]
     pagination_class = MyParticipatedHackathonPagination
-    filter_backends = (
-        DjangoFilterBackend,
-        filters.OrderingFilter,
-        filters.SearchFilter,
-    )
-    filterset_class = HackathonFilterSet
-    # TODO: move search by description to SearchVector
-    search_fields = ("title", "description")
-    ordering_fields = ("start_datetime", "end_datetime", "prize")
     ordering = ("-end_datetime",)
 
     def get_queryset(self):
         return Hackathon.objects.filter(participants__user=self.request.user)
 
 
-class MyHostedHackathonListAPIView(generics.ListAPIView):
+class MyHostedHackathonListAPIView(HackathonFilterMixin, generics.ListAPIView):
     """
     Returns list of hackathons hosted by request.user
     """
@@ -42,22 +32,13 @@ class MyHostedHackathonListAPIView(generics.ListAPIView):
     serializer_class = HackathonListSerializer
     permission_classes = [permissions.IsAuthenticated]
     pagination_class = MyHostedHackathonPagination
-    filter_backends = (
-        DjangoFilterBackend,
-        filters.OrderingFilter,
-        filters.SearchFilter,
-    )
-    filterset_class = HackathonFilterSet
-    # TODO: move search by description to SearchVector
-    search_fields = ("title", "description")
-    ordering_fields = ("start_datetime", "end_datetime", "prize")
     ordering = ("-end_datetime",)
 
     def get_queryset(self):
         return Hackathon.objects.filter(host=self.request.user)
 
 
-class UserHostedHackathonListAPIView(generics.ListAPIView):
+class UserHostedHackathonListAPIView(HackathonFilterMixin, generics.ListAPIView):
     """
     Returns list of hackathons hosted by user with id=`user_id`
     """
@@ -65,15 +46,6 @@ class UserHostedHackathonListAPIView(generics.ListAPIView):
     serializer_class = HackathonListSerializer
     permission_classes = [permissions.AllowAny]
     pagination_class = UserHostedHackathonPagination
-    filter_backends = (
-        DjangoFilterBackend,
-        filters.OrderingFilter,
-        filters.SearchFilter,
-    )
-    filterset_class = HackathonFilterSet
-    # TODO: move search by description to SearchVector
-    search_fields = ("title", "description")
-    ordering_fields = ("start_datetime", "end_datetime", "prize")
     ordering = ("-end_datetime",)
 
     def get_queryset(self):
