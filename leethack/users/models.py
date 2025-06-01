@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
 from django.db import models
@@ -28,7 +29,9 @@ class UserManager(BaseUserManager):
         if extra_fields.get("is_superuser") is not True:
             raise ValueError(_("Superuser must have is_superuser=True."))
 
-        return self.create_user(email, username=username, password=password, **extra_fields)
+        return self.create_user(
+            email, username=username, password=password, **extra_fields
+        )
 
 
 class User(UUIDModel, AbstractUser):
@@ -49,7 +52,17 @@ class User(UUIDModel, AbstractUser):
         max_length=20,
         choices=Role.choices,
         default=Role.USER,
-        help_text=_("Role of the user in the system.")
+        help_text=_("Role of the user in the system."),
+    )
+    profile_picture = models.ImageField(
+        upload_to="profile_pictures/",
+        blank=True,
+        default=settings.DEFAULT_PROFILE_PICTURE,
+    )
+    profile_background = models.ImageField(
+        upload_to="profile_backgrounds/",
+        blank=True,
+        default=settings.DEFAULT_PROFILE_BACKGROUND,
     )
 
     USERNAME_FIELD = "email"

@@ -111,6 +111,10 @@ REST_FRAMEWORK = {
 }
 
 
+DEFAULT_PROFILE_PICTURE = "profile_pictures/default.jpg"
+DEFAULT_PROFILE_BACKGROUND = "profile_backgrounds/default.jpg"
+
+
 AWS_ACCOUNT_ID = env("AWS_ACCOUNT_ID")
 AWS_ACCESS_KEY_ID = env("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = env("AWS_SECRET_ACCESS_KEY")
