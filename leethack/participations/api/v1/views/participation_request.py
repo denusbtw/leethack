@@ -3,6 +3,7 @@ from rest_framework import generics, permissions, filters
 
 from leethack.core.api.permissions import ReadOnly, PostOnly
 from leethack.hackathons.api.v1.permissions import IsHackathonHost
+from .mixins import ParticipationRequestFilterMixin
 from .pagination import HackathonParticipationRequestPagination
 from ..filters import ParticipationRequestFilterSet
 from ..serializers import (
@@ -14,7 +15,9 @@ from ..serializers import (
 from leethack.participations.models import ParticipationRequest
 
 
-class HackathonParticipationRequestListCreateAPIView(generics.ListCreateAPIView):
+class HackathonParticipationRequestListCreateAPIView(
+    ParticipationRequestFilterMixin, generics.ListCreateAPIView
+):
     """
     Returns participation requests of specific hackathon
     """
@@ -24,20 +27,12 @@ class HackathonParticipationRequestListCreateAPIView(generics.ListCreateAPIView)
         | (PostOnly & permissions.IsAuthenticated)
     ]
     pagination_class = HackathonParticipationRequestPagination
-    filter_backends = (
-        DjangoFilterBackend,
-        filters.OrderingFilter,
-        filters.SearchFilter,
-    )
-    filterset_class = ParticipationRequestFilterSet
     search_fields = (
         "user__username",
         "user__email",
         "user__first_name",
         "user__last_name",
     )
-    ordering_fields = ("created_at",)
-    ordering = ("-created_at",)
 
     def get_queryset(self):
         hackathon_id = self.kwargs["hackathon_id"]

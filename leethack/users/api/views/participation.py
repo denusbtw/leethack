@@ -1,8 +1,10 @@
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import generics, permissions, filters
+from rest_framework import generics, permissions
 from rest_framework.exceptions import PermissionDenied
 
-from leethack.participations.api.v1.filters import ParticipationRequestFilterSet
+from leethack.participations.api.v1.views.mixins import (
+    ParticipantFilterMixin,
+    ParticipationRequestFilterMixin,
+)
 from leethack.participations.models import ParticipationRequest, Participant
 from leethack.users.api.serializers import (
     MyParticipationRequestListSerializer,
@@ -12,7 +14,9 @@ from leethack.users.api.serializers import (
 from .pagination import MyParticipationRequestPagination, MyParticipationPagination
 
 
-class MyParticipationRequestListAPIView(generics.ListAPIView):
+class MyParticipationRequestListAPIView(
+    ParticipationRequestFilterMixin, generics.ListAPIView
+):
     """
     Returns list of participation requests of request user
     """
@@ -20,15 +24,7 @@ class MyParticipationRequestListAPIView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = MyParticipationRequestListSerializer
     pagination_class = MyParticipationRequestPagination
-    filter_backends = (
-        DjangoFilterBackend,
-        filters.OrderingFilter,
-        filters.SearchFilter,
-    )
-    filterset_class = ParticipationRequestFilterSet
     search_fields = ("hackathon__title",)
-    ordering_fields = ("created_at",)
-    ordering = ("-created_at",)
 
     def get_queryset(self):
         return ParticipationRequest.objects.filter(user=self.request.user)
@@ -51,7 +47,7 @@ class MyParticipationRequestDetailAPIView(generics.RetrieveDestroyAPIView):
         instance.delete()
 
 
-class MyParticipationListAPIView(generics.ListAPIView):
+class MyParticipationListAPIView(ParticipantFilterMixin, generics.ListAPIView):
     """
     Returns list of participants where user is current user
     """
@@ -59,10 +55,7 @@ class MyParticipationListAPIView(generics.ListAPIView):
     serializer_class = MyParticipationListSerializer
     permission_classes = [permissions.IsAuthenticated]
     pagination_class = MyParticipationPagination
-    filter_backends = (filters.OrderingFilter, filters.SearchFilter)
     search_fields = ("hackathon__title",)
-    ordering_fields = ("created_at",)
-    ordering = ("-created_at",)
 
     def get_queryset(self):
         return Participant.objects.filter(user=self.request.user)

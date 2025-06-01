@@ -1,7 +1,8 @@
-from rest_framework import generics, permissions, filters
+from rest_framework import generics, permissions
 
 from leethack.core.api.permissions import ReadOnly
 from leethack.hackathons.api.v1.permissions import IsHackathonHost
+from .mixins import ParticipantFilterMixin
 from ..serializers import (
     HackathonParticipantListSerializer,
     HackathonParticipantDetailSerializer,
@@ -10,7 +11,7 @@ from .pagination import HackathonParticipantPagination
 from leethack.participations.models import Participant
 
 
-class HackathonParticipantListAPIView(generics.ListAPIView):
+class HackathonParticipantListAPIView(ParticipantFilterMixin, generics.ListAPIView):
     """
     Returns all participants of specific hackathon
     """
@@ -18,14 +19,12 @@ class HackathonParticipantListAPIView(generics.ListAPIView):
     serializer_class = HackathonParticipantListSerializer
     permission_classes = [permissions.IsAdminUser | IsHackathonHost]
     pagination_class = HackathonParticipantPagination
-    filter_backends = (filters.OrderingFilter, filters.SearchFilter)
     search_fields = (
         "user__username",
         "user__email",
         "user__first_name",
         "user__last_name",
     )
-    ordering_fields = ("created_at",)
     ordering = ("-created_at",)
 
     def get_queryset(self):
