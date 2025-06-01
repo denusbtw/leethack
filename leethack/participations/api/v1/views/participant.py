@@ -11,7 +11,15 @@ from .pagination import HackathonParticipantPagination
 from leethack.participations.models import Participant
 
 
-class HackathonParticipantListAPIView(ParticipantFilterMixin, generics.ListAPIView):
+class HackathonParticipantQuerySetMixin:
+    def get_queryset(self):
+        hackathon_id = self.kwargs["hackathon_id"]
+        return Participant.objects.filter(hackathon_id=hackathon_id)
+
+
+class HackathonParticipantListAPIView(
+    HackathonParticipantQuerySetMixin, ParticipantFilterMixin, generics.ListAPIView
+):
     """
     Returns all participants of specific hackathon
     """
@@ -25,21 +33,14 @@ class HackathonParticipantListAPIView(ParticipantFilterMixin, generics.ListAPIVi
         "user__first_name",
         "user__last_name",
     )
-    ordering = ("-created_at",)
-
-    def get_queryset(self):
-        hackathon_id = self.kwargs["hackathon_id"]
-        return Participant.objects.filter(hackathon_id=hackathon_id)
 
 
-class HackathonParticipantDetailAPIView(generics.RetrieveDestroyAPIView):
+class HackathonParticipantDetailAPIView(
+    HackathonParticipantQuerySetMixin, generics.RetrieveDestroyAPIView
+):
     """
     Returns participant of specific hackathon
     """
 
     serializer_class = HackathonParticipantDetailSerializer
     permission_classes = [IsHackathonHost | (ReadOnly & permissions.IsAdminUser)]
-
-    def get_queryset(self):
-        hackathon_id = self.kwargs["hackathon_id"]
-        return Participant.objects.filter(hackathon_id=hackathon_id)

@@ -15,8 +15,16 @@ from ..serializers import (
 from leethack.participations.models import ParticipationRequest
 
 
+class HackathonParticipationRequestQuerySetMixin:
+    def get_queryset(self):
+        hackathon_id = self.kwargs["hackathon_id"]
+        return ParticipationRequest.objects.filter(hackathon_id=hackathon_id)
+
+
 class HackathonParticipationRequestListCreateAPIView(
-    ParticipationRequestFilterMixin, generics.ListCreateAPIView
+    HackathonParticipationRequestQuerySetMixin,
+    ParticipationRequestFilterMixin,
+    generics.ListCreateAPIView,
 ):
     """
     Returns participation requests of specific hackathon
@@ -34,10 +42,6 @@ class HackathonParticipationRequestListCreateAPIView(
         "user__last_name",
     )
 
-    def get_queryset(self):
-        hackathon_id = self.kwargs["hackathon_id"]
-        return ParticipationRequest.objects.filter(hackathon_id=hackathon_id)
-
     def get_serializer_class(self):
         if self.request.method == "GET":
             return HackathonParticipationRequestListSerializer
@@ -51,16 +55,14 @@ class HackathonParticipationRequestListCreateAPIView(
         )
 
 
-class HackathonParticipationRequestDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+class HackathonParticipationRequestDetailAPIView(
+    HackathonParticipationRequestQuerySetMixin, generics.RetrieveUpdateDestroyAPIView
+):
     """
     Returns participation request of specific hackathon
     """
 
     permission_classes = [permissions.IsAdminUser | IsHackathonHost]
-
-    def get_queryset(self):
-        hackathon_id = self.kwargs["hackathon_id"]
-        return ParticipationRequest.objects.filter(hackathon_id=hackathon_id)
 
     def get_serializer_class(self):
         if self.request.method == "GET":
