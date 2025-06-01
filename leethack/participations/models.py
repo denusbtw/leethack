@@ -59,6 +59,7 @@ class ParticipationRequest(UUIDModel, TimestampedModel):
         constraints = [
             models.UniqueConstraint(
                 fields=("user", "hackathon"),
+                condition=models.Q(status="approved"),
                 name="unique_participation_request_user_hackathon",
             )
         ]

@@ -1,7 +1,7 @@
 import pytest
 from django.db import IntegrityError
 
-from leethack.participations.models import Participant
+from leethack.participations.models import Participant, ParticipationRequest
 
 
 @pytest.mark.django_db
@@ -20,18 +20,6 @@ class TestParticipant:
 
 @pytest.mark.django_db
 class TestParticipationRequest:
-
-    def test_error_if_not_unique_user_and_hackathon(
-        self, user_factory, hackathon_factory, participation_request_factory
-    ):
-        user = user_factory()
-        hackathon = hackathon_factory()
-
-        participation_request = participation_request_factory(
-            user=user, hackathon=hackathon
-        )
-        with pytest.raises(IntegrityError):
-            participation_request_factory(user=user, hackathon=hackathon)
 
     @pytest.mark.parametrize(
         "participation_request_fixture, should_pass",
@@ -94,3 +82,36 @@ class TestParticipationRequest:
         approved_participation_request.reject()
         assert approved_participation_request.is_rejected
         assert not Participant.objects.filter(pk=participant.pk).exists()
+
+    def test_user_can_have_only_one_approved_request(
+        self, user, hackathon, participation_request_factory
+    ):
+        participation_request_factory(
+            user=user, hackathon=hackathon, status=ParticipationRequest.Status.APPROVED
+        )
+        with pytest.raises(IntegrityError):
+            participation_request_factory(
+                user=user,
+                hackathon=hackathon,
+                status=ParticipationRequest.Status.APPROVED,
+            )
+
+    def test_user_can_have_multiple_pending_requests(
+        self, user, hackathon, participation_request_factory
+    ):
+        participation_request_factory(
+            user=user, hackathon=hackathon, status=ParticipationRequest.Status.PENDING
+        )
+        participation_request_factory(
+            user=user, hackathon=hackathon, status=ParticipationRequest.Status.PENDING
+        )
+
+    def test_user_can_have_multiple_rejected_requests(
+        self, user, hackathon, participation_request_factory
+    ):
+        participation_request_factory(
+            user=user, hackathon=hackathon, status=ParticipationRequest.Status.REJECTED
+        )
+        participation_request_factory(
+            user=user, hackathon=hackathon, status=ParticipationRequest.Status.REJECTED
+        )
