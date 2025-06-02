@@ -47,6 +47,7 @@ THIRD_PARTY_APPS = [
     "rest_framework",
     "django_filters",
     "storages",
+    "debug_toolbar",
 ]
 
 LOCAL_APPS = [
@@ -77,6 +78,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 MIDDLEWARE = [
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -121,6 +123,8 @@ AWS_SECRET_ACCESS_KEY = env("AWS_SECRET_ACCESS_KEY")
 AWS_STORAGE_BUCKET_NAME = env("AWS_STORAGE_BUCKET_NAME")
 AWS_S3_ENDPOINT_URL = f"https://{AWS_ACCOUNT_ID}.r2.cloudflarestorage.com"
 
+
+# TODO: чомусь не можна подивитись картинку, помилка
 STORAGES = {
     "default": {
         "BACKEND": "storages.backends.s3.S3Storage",
@@ -136,3 +140,8 @@ STORAGES = {
         "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
     },
 }
+
+
+INTERNAL_IPS = [
+    "127.0.0.1",
+]
