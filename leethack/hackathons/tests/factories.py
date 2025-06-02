@@ -14,7 +14,7 @@ faker = Faker()
 
 
 class CategoryFactory(factory.django.DjangoModelFactory):
-    title = factory.Faker("word")
+    title = factory.Sequence(lambda n: f"category_{n}")
 
     class Meta:
         model = Category
@@ -22,7 +22,7 @@ class CategoryFactory(factory.django.DjangoModelFactory):
 
 class HackathonFactory(factory.django.DjangoModelFactory):
     host = factory.SubFactory(UserFactory, role=User.Role.HOST)
-    title = factory.Faker("sentence", nb_words=3)
+    title = factory.Sequence(lambda n: f"hackathon_{n}")
     description = factory.Faker("paragraph", nb_sentences=3)
     category = factory.SubFactory(CategoryFactory)
     prize = factory.Faker("pyint", min_value=0, max_value=100000)

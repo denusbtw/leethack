@@ -8,6 +8,15 @@ User = get_user_model()
 
 @admin.register(User)
 class UserAdmin(UserAdmin):
+    list_display = (
+        "email",
+        "username",
+        "first_name",
+        "last_name",
+        "is_staff",
+        "is_host",
+    )
+
     fieldsets = (
         (None, {"fields": ("username", "password")}),
         (
@@ -17,6 +26,7 @@ class UserAdmin(UserAdmin):
                     "first_name",
                     "last_name",
                     "email",
+                    "role",
                     "profile_picture",
                     "profile_background",
                 )
@@ -41,7 +51,11 @@ class UserAdmin(UserAdmin):
             None,
             {
                 "classes": ("wide",),
-                "fields": ("username", "usable_password", "password1", "password2"),
+                "fields": ("email", "password1", "password2"),
             },
         ),
     )
+
+    @admin.display(description="Is Host", boolean=True)
+    def is_host(self, obj) -> bool:
+        return obj.is_host
