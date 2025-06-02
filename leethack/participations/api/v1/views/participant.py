@@ -13,8 +13,9 @@ from leethack.participations.models import Participant
 
 class HackathonParticipantQuerySetMixin:
     def get_queryset(self):
-        hackathon_id = self.kwargs["hackathon_id"]
-        return Participant.objects.filter(hackathon_id=hackathon_id)
+        qs = Participant.objects.filter(hackathon_id=self.kwargs["hackathon_id"])
+        qs = qs.select_related("user")
+        return qs
 
 
 class HackathonParticipantListAPIView(

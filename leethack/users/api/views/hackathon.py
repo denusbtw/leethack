@@ -10,7 +10,16 @@ from .pagination import (
 )
 
 
-class MyParticipatedHackathonListAPIView(HackathonFilterMixin, generics.ListAPIView):
+class HackathonSelectRelatedQuerySetMixin:
+    def get_queryset(self):
+        return Hackathon.objects.select_related(
+            "category", "host", "winner", "winner__user"
+        )
+
+
+class MyParticipatedHackathonListAPIView(
+    HackathonSelectRelatedQuerySetMixin, HackathonFilterMixin, generics.ListAPIView
+):
     """
     Returns list of hackathons where current user is participant
     """
@@ -20,10 +29,12 @@ class MyParticipatedHackathonListAPIView(HackathonFilterMixin, generics.ListAPIV
     pagination_class = MyParticipatedHackathonPagination
 
     def get_queryset(self):
-        return Hackathon.objects.filter(participants__user=self.request.user)
+        return super().get_queryset().filter(participants__user=self.request.user)
 
 
-class MyHostedHackathonListAPIView(HackathonFilterMixin, generics.ListAPIView):
+class MyHostedHackathonListAPIView(
+    HackathonSelectRelatedQuerySetMixin, HackathonFilterMixin, generics.ListAPIView
+):
     """
     Returns list of hackathons hosted by request.user
     """
@@ -33,10 +44,12 @@ class MyHostedHackathonListAPIView(HackathonFilterMixin, generics.ListAPIView):
     pagination_class = MyHostedHackathonPagination
 
     def get_queryset(self):
-        return Hackathon.objects.filter(host=self.request.user)
+        return super().get_queryset().filter(host=self.request.user)
 
 
-class UserHostedHackathonListAPIView(HackathonFilterMixin, generics.ListAPIView):
+class UserHostedHackathonListAPIView(
+    HackathonSelectRelatedQuerySetMixin, HackathonFilterMixin, generics.ListAPIView
+):
     """
     Returns list of hackathons hosted by user with id=`user_id`
     """
@@ -46,5 +59,4 @@ class UserHostedHackathonListAPIView(HackathonFilterMixin, generics.ListAPIView)
     pagination_class = UserHostedHackathonPagination
 
     def get_queryset(self):
-        user_id = self.kwargs["user_id"]
-        return Hackathon.objects.filter(host_id=user_id)
+        return super().get_queryset().filter(host_id=self.kwargs["user_id"])

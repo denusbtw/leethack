@@ -14,12 +14,18 @@ from leethack.hackathons.models import Hackathon
 from leethack.users.api.permissions import IsHost
 
 
-class HackathonListCreateAPIView(HackathonFilterMixin, generics.ListCreateAPIView):
+class HackathonQuerySetMixin:
+    def get_queryset(self):
+        return Hackathon.objects.select_related("category", "host", "winner")
+
+
+class HackathonListCreateAPIView(
+    HackathonQuerySetMixin, HackathonFilterMixin, generics.ListCreateAPIView
+):
     """
     Returns list of all hackathons
     """
 
-    queryset = Hackathon.objects.all()
     permission_classes = [ReadOnly | permissions.IsAdminUser | IsHost]
     pagination_class = HackathonPagination
     ordering = ("start_datetime",)
@@ -33,13 +39,17 @@ class HackathonListCreateAPIView(HackathonFilterMixin, generics.ListCreateAPIVie
         serializer.save(host=self.request.user)
 
 
-class HackathonDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+class HackathonDetailAPIView(
+    HackathonQuerySetMixin, generics.RetrieveUpdateDestroyAPIView
+):
     """
     Returns hackathon
     """
 
-    queryset = Hackathon.objects.all()
     permission_classes = [ReadOnly | permissions.IsAdminUser | IsHackathonHost]
+
+    def get_queryset(self):
+        return super().get_queryset().select_related("winner__user")
 
     def get_serializer_class(self):
         if self.request.method == "GET":

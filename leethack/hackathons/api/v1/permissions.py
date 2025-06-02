@@ -25,12 +25,34 @@ def resolve_hackathon_from_obj(obj):
 
 class IsHackathonHost(BasePermission):
 
-    def has_permission(self, request, view):
+    def get_hackathon(self, view):
+        # кешую хакатон у view, щоб зменшити кількість запитів
+        # це працює тому що між запитами кеш не зберігається
+
+        if hasattr(view, "_cached_hackathon"):
+            return view._cached_hackathon
+
         hackathon_id = resolve_hackathon_id_from_view(view)
         hackathon = get_object_or_404(Hackathon, pk=hackathon_id)
+        view._cached_hackathon = hackathon
+        return hackathon
+
+    def has_permission(self, request, view):
+        hackathon = self.get_hackathon(view)
         return request.user == hackathon.host
 
     def has_object_permission(self, request, view, obj):
         hackathon_id = resolve_hackathon_from_obj(obj)
-        hackathon = get_object_or_404(Hackathon, pk=hackathon_id)
-        return request.user == hackathon.host
+
+        if hackathon_id:
+            if (
+                hasattr(view, "_cached_hackathon")
+                and view._cached_hackathon.pk == hackathon_id
+            ):
+                hackathon = view._cached_hackathon
+            else:
+                hackathon = get_object_or_404(Hackathon, pk=hackathon_id)
+        else:
+            hackathon = self.get_hackathon(view)
+
+        return request.user == hackathon.host if hackathon else False

@@ -27,7 +27,9 @@ class MyParticipationRequestListAPIView(
     search_fields = ("hackathon__title",)
 
     def get_queryset(self):
-        return ParticipationRequest.objects.filter(user=self.request.user)
+        qs = ParticipationRequest.objects.filter(user=self.request.user)
+        qs = qs.select_related("hackathon", "hackathon__category")
+        return qs
 
 
 class MyParticipationRequestDetailAPIView(generics.RetrieveDestroyAPIView):
@@ -39,7 +41,9 @@ class MyParticipationRequestDetailAPIView(generics.RetrieveDestroyAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return ParticipationRequest.objects.filter(user=self.request.user)
+        qs = ParticipationRequest.objects.filter(user=self.request.user)
+        qs = qs.select_related("hackathon", "hackathon__category")
+        return qs
 
     def perform_destroy(self, instance):
         if not instance.is_pending:
@@ -58,4 +62,6 @@ class MyParticipationListAPIView(ParticipantFilterMixin, generics.ListAPIView):
     search_fields = ("hackathon__title",)
 
     def get_queryset(self):
-        return Participant.objects.filter(user=self.request.user)
+        qs = Participant.objects.filter(user=self.request.user)
+        qs = qs.select_related("hackathon", "hackathon__category")
+        return qs

@@ -54,6 +54,7 @@ class Hackathon(UUIDModel, TimestampedModel):
         blank=True,
         related_name="won_hackathons",
     )
+    # TODO: генерувати унікальні імена для файлів
     image = models.ImageField(upload_to="hackathons/")
 
     class Meta:

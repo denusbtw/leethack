@@ -1,12 +1,15 @@
 from rest_framework import serializers
 
-from leethack.participations.api.v1.serializers.nested import (
-    ParticipantNestedSerializer,
-)
+from leethack.participations.models import Participant
 from .nested import CategoryNestedSerializer
 from leethack.hackathons.models import Hackathon
 
 from leethack.users.api.serializers import UserNestedSerializer
+
+
+class ParticipantNestedSerializer(serializers.Serializer):
+    id = serializers.UUIDField()
+    user = UserNestedSerializer()
 
 
 class BaseHackathonReadSerializer(serializers.Serializer):
@@ -45,6 +48,11 @@ class HackathonCreateSerializer(serializers.ModelSerializer):
 
 
 class HackathonUpdateSerializer(serializers.ModelSerializer):
+    winner = serializers.PrimaryKeyRelatedField(
+        queryset=Participant.objects.none(),
+        required=False,
+    )
+
     class Meta:
         model = Hackathon
         fields = (
@@ -66,6 +74,22 @@ class HackathonUpdateSerializer(serializers.ModelSerializer):
             "end_datetime": {"required": False},
             "image": {"required": False},
         }
+
+    def __init__(self, **kwargs):
+        # фільтрую winner учасниками поточного хакатону
+        super().__init__(**kwargs)
+
+        hackathon = self.instance
+
+        if not hackathon:
+            hackathon = self.context.get("hackathon")
+
+        if hackathon:
+            qs = Participant.objects.filter(hackathon=hackathon)
+            qs = qs.select_related("user", "hackathon")
+            self.fields["winner"].queryset = qs
+        else:
+            self.fields["winner"].queryset = Participant.objects.none()
 
     def validate(self, attrs):
         winner = attrs.get("winner")

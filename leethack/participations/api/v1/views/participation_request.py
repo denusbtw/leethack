@@ -1,11 +1,9 @@
-from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, permissions, filters
 
 from leethack.core.api.permissions import ReadOnly, PostOnly
 from leethack.hackathons.api.v1.permissions import IsHackathonHost
 from .mixins import ParticipationRequestFilterMixin
 from .pagination import HackathonParticipationRequestPagination
-from ..filters import ParticipationRequestFilterSet
 from ..serializers import (
     HackathonParticipationRequestListSerializer,
     HackathonParticipationRequestCreateSerializer,
@@ -18,7 +16,9 @@ from leethack.participations.models import ParticipationRequest
 class HackathonParticipationRequestQuerySetMixin:
     def get_queryset(self):
         hackathon_id = self.kwargs["hackathon_id"]
-        return ParticipationRequest.objects.filter(hackathon_id=hackathon_id)
+        qs = ParticipationRequest.objects.filter(hackathon_id=hackathon_id)
+        qs = qs.select_related("user")
+        return qs
 
 
 class HackathonParticipationRequestListCreateAPIView(
