@@ -4,12 +4,7 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 
-from leethack.core.validators import (
-    ImageFormatValidator,
-    MinResolutionValidator,
-    MaxImageSizeValidator,
-    ImageRatioValidator,
-)
+from leethack.core.utils import build_image_validators
 
 User = get_user_model()
 
@@ -29,15 +24,6 @@ class MeRetrieveSerializer(serializers.Serializer):
     last_name = serializers.CharField()
     profile_picture = serializers.ImageField()
     profile_background = serializers.ImageField()
-
-
-def build_image_validators(config):
-    return [
-        ImageFormatValidator(config),
-        ImageRatioValidator(config),
-        MinResolutionValidator(config),
-        MaxImageSizeValidator(config),
-    ]
 
 
 class MeUpdateSerializer(serializers.ModelSerializer):

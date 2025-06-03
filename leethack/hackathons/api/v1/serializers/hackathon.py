@@ -1,6 +1,8 @@
+from django.conf import settings
 from rest_framework import serializers
 
 from leethack.participations.models import Participant
+from leethack.core.utils import build_image_validators
 from .nested import CategoryNestedSerializer
 from leethack.hackathons.models import Hackathon
 
@@ -33,6 +35,10 @@ class HackathonRetrieveSerializer(BaseHackathonReadSerializer):
 
 
 class HackathonCreateSerializer(serializers.ModelSerializer):
+    image = serializers.ImageField(
+        validators=build_image_validators(settings.HACKATHON_IMAGE_CONFIG)
+    )
+
     class Meta:
         model = Hackathon
         fields = (
@@ -51,6 +57,9 @@ class HackathonUpdateSerializer(serializers.ModelSerializer):
     winner = serializers.PrimaryKeyRelatedField(
         queryset=Participant.objects.none(),
         required=False,
+    )
+    image = serializers.ImageField(
+        validators=build_image_validators(settings.HACKATHON_IMAGE_CONFIG)
     )
 
     class Meta:
@@ -75,11 +84,11 @@ class HackathonUpdateSerializer(serializers.ModelSerializer):
             "image": {"required": False},
         }
 
-    def __init__(self, **kwargs):
+    def __init__(self, instance, **kwargs):
         # фільтрую winner учасниками поточного хакатону
         super().__init__(**kwargs)
 
-        hackathon = self.instance
+        hackathon = instance
 
         if not hackathon:
             hackathon = self.context.get("hackathon")

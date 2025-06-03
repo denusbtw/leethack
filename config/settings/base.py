@@ -132,6 +132,14 @@ PROFILE_BACKGROUND_CONFIG = {
     "max_size_mb": 7,
 }
 
+HACKATHON_IMAGE_CONFIG = {
+    "allowed_formats": {"jpeg", "png", "webp", "bmp"},
+    "ratio": (1 / 1, "1:1"),
+    "min_width": 192,
+    "min_height": 192,
+    "max_size_mb": 2,
+}
+
 AWS_ACCOUNT_ID = env("AWS_ACCOUNT_ID")
 AWS_ACCESS_KEY_ID = env("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = env("AWS_SECRET_ACCESS_KEY")
