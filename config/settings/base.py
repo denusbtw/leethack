@@ -139,7 +139,6 @@ AWS_STORAGE_BUCKET_NAME = env("AWS_STORAGE_BUCKET_NAME")
 AWS_S3_ENDPOINT_URL = f"https://{AWS_ACCOUNT_ID}.r2.cloudflarestorage.com"
 
 
-# TODO: чомусь не можна подивитись картинку, помилка
 STORAGES = {
     "default": {
         "BACKEND": "storages.backends.s3.S3Storage",
@@ -149,6 +148,7 @@ STORAGES = {
             "bucket_name": AWS_STORAGE_BUCKET_NAME,
             "endpoint_url": AWS_S3_ENDPOINT_URL,
             "location": "media",
+            "signature_version": "s3v4",
         },
     },
     "staticfiles": {
