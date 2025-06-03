@@ -1,6 +1,15 @@
+from django.conf import settings
 from rest_framework import serializers
 
 from django.contrib.auth import get_user_model
+from django.contrib.auth.password_validation import validate_password
+
+from leethack.core.validators import (
+    ImageFormatValidator,
+    MinResolutionValidator,
+    MaxImageSizeValidator,
+    ImageRatioValidator,
+)
 
 User = get_user_model()
 
@@ -22,7 +31,26 @@ class MeRetrieveSerializer(serializers.Serializer):
     profile_background = serializers.ImageField()
 
 
+def build_image_validators(config):
+    return [
+        ImageFormatValidator(config),
+        ImageRatioValidator(config),
+        MinResolutionValidator(config),
+        MaxImageSizeValidator(config),
+    ]
+
+
 class MeUpdateSerializer(serializers.ModelSerializer):
+    profile_picture = serializers.ImageField(
+        validators=build_image_validators(settings.PROFILE_PICTURE_CONFIG),
+        required=False,
+    )
+    profile_background = serializers.ImageField(
+        validators=build_image_validators(settings.PROFILE_BACKGROUND_CONFIG),
+        required=False,
+    )
+    password = serializers.CharField(write_only=True, required=False, min_length=8)
+
     class Meta:
         model = User
         fields = (
@@ -36,8 +64,11 @@ class MeUpdateSerializer(serializers.ModelSerializer):
         )
         extra_kwargs = {
             "email": {"required": False},
-            "password": {"required": False},
         }
+
+    def validate_password(self, value):
+        validate_password(value)
+        return value
 
     def update(self, instance, validated_data):
         password = validated_data.pop("password", None)

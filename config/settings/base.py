@@ -116,6 +116,21 @@ REST_FRAMEWORK = {
 DEFAULT_PROFILE_PICTURE = "profile_pictures/default.jpg"
 DEFAULT_PROFILE_BACKGROUND = "profile_backgrounds/default.jpg"
 
+PROFILE_PICTURE_CONFIG = {
+    "allowed_formats": {"jpeg", "png", "webp", "bmp"},
+    "ratio": (1 / 1, "1:1"),
+    "min_width": 192,
+    "min_height": 192,
+    "max_size_mb": 2,
+}
+
+PROFILE_BACKGROUND_CONFIG = {
+    "allowed_formats": {"jpeg", "png", "webp", "bmp"},
+    "ratio": (16 / 9, "16:9"),
+    "min_width": 1920,
+    "min_height": 1080,
+    "max_size_mb": 7,
+}
 
 AWS_ACCOUNT_ID = env("AWS_ACCOUNT_ID")
 AWS_ACCESS_KEY_ID = env("AWS_ACCESS_KEY_ID")
