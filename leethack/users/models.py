@@ -70,6 +70,8 @@ class User(UUIDModel, AbstractUser):
 
     objects = UserManager()
 
+    # TODO: add resize of profile_picture and profile_background, convert to JPEG
+
     def save(self, *args, **kwargs):
         if not self.username:
             self.username = self.email.split("@")[0]
