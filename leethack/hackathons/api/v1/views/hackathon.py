@@ -23,7 +23,9 @@ class HackathonListCreateAPIView(
     HackathonQuerySetMixin, HackathonFilterMixin, generics.ListCreateAPIView
 ):
     """
-    Returns list of all hackathons
+    GET: Return paginated list of hackathons.
+    POST: Create new hackathon.
+    Only hosts or admin can perform these actions.
     """
 
     permission_classes = [ReadOnly | permissions.IsAdminUser | IsHost]
@@ -43,7 +45,10 @@ class HackathonDetailAPIView(
     HackathonQuerySetMixin, generics.RetrieveUpdateDestroyAPIView
 ):
     """
-    Returns hackathon
+    GET: Retrieve detailed information about a specific hackathon.
+    PATCH: Update hackathon details.
+    DELETE: Delete a hackathon..
+    Only hackathon host or admin can perform these actions.
     """
 
     permission_classes = [ReadOnly | permissions.IsAdminUser | IsHackathonHost]

@@ -21,7 +21,8 @@ class MyParticipatedHackathonListAPIView(
     HackathonSelectRelatedQuerySetMixin, HackathonFilterMixin, generics.ListAPIView
 ):
     """
-    Returns list of hackathons where current user is participant
+    GET: Return paginated list of hackathons the authenticated user is participating in.
+    Only authenticated user can perform this action.
     """
 
     serializer_class = HackathonListSerializer
@@ -36,7 +37,8 @@ class MyHostedHackathonListAPIView(
     HackathonSelectRelatedQuerySetMixin, HackathonFilterMixin, generics.ListAPIView
 ):
     """
-    Returns list of hackathons hosted by request.user
+    GET: Return paginated list of hackathons the authenticated user is hosting.
+    Only host can perform this action.
     """
 
     serializer_class = HackathonListSerializer
@@ -51,7 +53,8 @@ class UserHostedHackathonListAPIView(
     HackathonSelectRelatedQuerySetMixin, HackathonFilterMixin, generics.ListAPIView
 ):
     """
-    Returns list of hackathons hosted by user with id=`user_id`
+    GET: Return paginated list of hackathons the specific user is hosting.
+    Any user can perform this action.
     """
 
     serializer_class = HackathonListSerializer

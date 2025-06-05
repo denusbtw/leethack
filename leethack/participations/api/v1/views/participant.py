@@ -22,7 +22,8 @@ class HackathonParticipantListAPIView(
     HackathonParticipantQuerySetMixin, ParticipantFilterMixin, generics.ListAPIView
 ):
     """
-    Returns all participants of specific hackathon
+    GET: Return a paginated list of participant for a specific hackathon.
+    Only hackathon host or admin can perform this action.
     """
 
     serializer_class = HackathonParticipantListSerializer
@@ -40,7 +41,9 @@ class HackathonParticipantDetailAPIView(
     HackathonParticipantQuerySetMixin, generics.RetrieveDestroyAPIView
 ):
     """
-    Returns participant of specific hackathon
+    GET: Retrieve detailed information about specific participant of specific hackathon.
+    DELETE: Delete a participant of a specific hackathon.
+    Only hackathon host or admin can perform these actions.
     """
 
     serializer_class = HackathonParticipantDetailSerializer

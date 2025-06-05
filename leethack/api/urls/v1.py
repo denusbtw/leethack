@@ -72,6 +72,12 @@ me_urlpatterns = [
         MyParticipationListAPIView.as_view(),
         name="my_participation_list",
     ),
+    # TODO:
+    # path(
+    #     "participations/<uuid:pk>/",
+    #     MyPaticipationDetailAPIView.as_view(),
+    #     name="my_participation_detail"
+    # ),
     path(
         "hosted-hackathons/",
         MyHostedHackathonListAPIView.as_view(),

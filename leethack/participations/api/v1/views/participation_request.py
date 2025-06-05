@@ -27,8 +27,11 @@ class HackathonParticipationRequestListCreateAPIView(
     generics.ListCreateAPIView,
 ):
     """
-    Returns participation requests of specific hackathon
+    GET: Return list of pagination participation requests for a specific hackathon. Only hackathon host or admin can perform this action.
+    POST: Create pending participation request for current user. Only authenticated user can perform this action.
     """
+
+    # TODO: POST 400 if current user is already participant of hackathon
 
     permission_classes = [
         ReadOnly & (permissions.IsAdminUser | IsHackathonHost)
@@ -59,7 +62,10 @@ class HackathonParticipationRequestDetailAPIView(
     HackathonParticipationRequestQuerySetMixin, generics.RetrieveUpdateDestroyAPIView
 ):
     """
-    Returns participation request of specific hackathon
+    GET: Return detailed information about specific participation request.
+    PATCH: Update only status (approved or rejected) of participation request.
+    DELETE: Delete participation request.
+    Only hackathon host or admin can perform these actions.
     """
 
     permission_classes = [permissions.IsAdminUser | IsHackathonHost]

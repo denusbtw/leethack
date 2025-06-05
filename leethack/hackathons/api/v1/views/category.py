@@ -6,6 +6,10 @@ from leethack.hackathons.models import Category
 
 
 class CategoryListAPIView(generics.ListAPIView):
+    """
+    GET: Return paginated list of categories. Any user can perform this action.
+    """
+
     queryset = Category.objects.all()
     serializer_class = CategoryListSerializer
     pagination_class = CategoryPagination

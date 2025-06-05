@@ -18,7 +18,8 @@ class MyParticipationRequestListAPIView(
     ParticipationRequestFilterMixin, generics.ListAPIView
 ):
     """
-    Returns list of participation requests of request user
+    GET: Return paginated list of participation requests of authenticated user.
+    Only authenticated user can perform this action.
     """
 
     permission_classes = [permissions.IsAuthenticated]
@@ -34,7 +35,9 @@ class MyParticipationRequestListAPIView(
 
 class MyParticipationRequestDetailAPIView(generics.RetrieveDestroyAPIView):
     """
-    Returns participation request of request user
+    GET: Return detailed information about specific participation request of authenticated user.
+    DELETE: Delete participation request (only pending).
+    Only authenticated user can perform these actions.
     """
 
     serializer_class = MyParticipationRequestRetrieveSerializer
@@ -53,7 +56,8 @@ class MyParticipationRequestDetailAPIView(generics.RetrieveDestroyAPIView):
 
 class MyParticipationListAPIView(ParticipantFilterMixin, generics.ListAPIView):
     """
-    Returns list of participants where user is current user
+    GET: Return paginated list of hackathons the authenticated user is participating in.
+    Only authenticated user can perform this action.
     """
 
     serializer_class = MyParticipationListSerializer
@@ -65,3 +69,7 @@ class MyParticipationListAPIView(ParticipantFilterMixin, generics.ListAPIView):
         qs = Participant.objects.filter(user=self.request.user)
         qs = qs.select_related("hackathon", "hackathon__category")
         return qs
+
+
+# class MyParticipationDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+#     pass

@@ -9,6 +9,13 @@ User = get_user_model()
 
 
 class MeDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+    """
+    GET: Retrieve the authenticated user's profile.
+    PATCH: Update the authenticated user's profile.
+    DELETE: Delete the authenticated user.
+    Only authenticated user can perform these actions.
+    """
+
     permission_classes = [permissions.IsAuthenticated]
 
     def get_object(self):
