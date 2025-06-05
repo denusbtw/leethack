@@ -10,33 +10,63 @@ from leethack.users.api.serializers import UserNestedSerializer
 
 
 class ParticipantNestedSerializer(serializers.Serializer):
-    id = serializers.UUIDField()
-    user = UserNestedSerializer()
+    """Nested serializer for Participant model."""
+
+    id = serializers.UUIDField(help_text="UUID of participant.")
+    user = UserNestedSerializer(help_text="Detailed representation of user.")
 
 
 class BaseHackathonReadSerializer(serializers.Serializer):
-    id = serializers.UUIDField()
-    host = UserNestedSerializer()
-    title = serializers.CharField()
-    category = CategoryNestedSerializer()
-    prize = serializers.IntegerField()
-    start_datetime = serializers.DateTimeField()
-    end_datetime = serializers.DateTimeField()
-    winner = ParticipantNestedSerializer()
-    image = serializers.ImageField()
+    """
+    Base read serializer for Hackathon model.
+    Includes common fields for list and retrieve serializers.
+    """
+
+    id = serializers.UUIDField(help_text="Unique identifier of hackathon.")
+    host = UserNestedSerializer(help_text="Detailed representation of host.")
+    title = serializers.CharField(help_text="Name of hackathon.")
+    category = CategoryNestedSerializer(
+        help_text="Nested detail representation of category."
+    )
+    prize = serializers.IntegerField(help_text="Prize for winning hackathon.")
+    start_datetime = serializers.DateTimeField(
+        help_text="Timestamp when the hackathon starts."
+    )
+    end_datetime = serializers.DateTimeField(
+        help_text="Timestamp when the hackathon ends."
+    )
+    winner = ParticipantNestedSerializer(
+        help_text="Nested detail representation of winner."
+    )
+    image = serializers.ImageField(
+        help_text="URL of the image stored in Cloudflare R2."
+    )
 
 
 class HackathonListSerializer(BaseHackathonReadSerializer):
+    """Serializer for listing hackathons."""
+
     pass
 
 
 class HackathonRetrieveSerializer(BaseHackathonReadSerializer):
-    description = serializers.CharField()
+    """
+    Serializer for retrieving detailed hackathon info.
+    Includes additional "description" field.
+    """
+
+    description = serializers.CharField(help_text="Description of hackathon.")
 
 
 class HackathonCreateSerializer(serializers.ModelSerializer):
+    """
+    Serializer for creating hackathon.
+    Validates image using custom validators.
+    """
+
     image = serializers.ImageField(
-        validators=build_image_validators(settings.HACKATHON_IMAGE_CONFIG)
+        validators=build_image_validators(settings.HACKATHON_IMAGE_CONFIG),
+        help_text="Image of hackathon.",
     )
 
     class Meta:
@@ -54,12 +84,19 @@ class HackathonCreateSerializer(serializers.ModelSerializer):
 
 
 class HackathonUpdateSerializer(serializers.ModelSerializer):
+    """
+    Serializer for updating hackathons.
+    Validates winner field against hackathon participants and image.
+    """
+
     winner = serializers.PrimaryKeyRelatedField(
         queryset=Participant.objects.none(),
         required=False,
+        help_text="UUID of Participant instance.",
     )
     image = serializers.ImageField(
-        validators=build_image_validators(settings.HACKATHON_IMAGE_CONFIG)
+        validators=build_image_validators(settings.HACKATHON_IMAGE_CONFIG),
+        help_text="New image of hackathon.",
     )
 
     class Meta:

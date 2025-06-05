@@ -2,6 +2,8 @@ from rest_framework import serializers
 
 
 class CategoryListSerializer(serializers.Serializer):
-    id = serializers.UUIDField()
-    title = serializers.CharField()
-    slug = serializers.SlugField()
+    """Serializer for listing categories."""
+
+    id = serializers.UUIDField(help_text="Unique identifier of the category.")
+    title = serializers.CharField(help_text="Name of the category.")
+    slug = serializers.SlugField(help_text="URL-friendly identifier.")

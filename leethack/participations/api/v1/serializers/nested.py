@@ -5,6 +5,10 @@ from leethack.users.api.serializers import UserNestedSerializer
 
 
 class ParticipantNestedSerializer(serializers.Serializer):
-    id = serializers.UUIDField()
-    user = UserNestedSerializer()
-    hackathon = HackathonNestedSerializer()
+    """Nested serializer for Participant model."""
+
+    id = serializers.UUIDField(help_text="Unique identifier of participant.")
+    user = UserNestedSerializer(help_text="Nested detailed representation of user.")
+    hackathon = HackathonNestedSerializer(
+        help_text="Nested detailed representation of hackathon."
+    )

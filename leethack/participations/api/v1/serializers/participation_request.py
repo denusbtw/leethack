@@ -6,31 +6,46 @@ from leethack.users.api.serializers import UserNestedSerializer
 
 
 class BaseHackathonParticipationRequestReadSerializer(serializers.Serializer):
-    id = serializers.UUIDField()
-    user = UserNestedSerializer()
-    status = serializers.CharField(source="get_status_display")
-    created_at = serializers.DateTimeField()
+    """Base read serializer for participation requests of hackathon."""
+
+    id = serializers.UUIDField(help_text="Unique identifier of participation request.")
+    user = UserNestedSerializer(help_text="Nested detail information about user.")
+    status = serializers.CharField(
+        source="get_status_display",
+        help_text="Human-readable status of participation request.",
+    )
+    created_at = serializers.DateTimeField(
+        help_text="Timestamp when the participation request was created."
+    )
 
 
 class HackathonParticipationRequestListSerializer(
     BaseHackathonParticipationRequestReadSerializer
 ):
+    """Serializer for listing participation requests"""
+
     pass
 
 
 class HackathonParticipationRequestRetrieveSerializer(
     BaseHackathonParticipationRequestReadSerializer
 ):
+    """Serializer for retrieving detailed information about participation request."""
+
     pass
 
 
 class HackathonParticipationRequestCreateSerializer(serializers.ModelSerializer):
+    """Serializer for creating pending participation request of hackathon."""
+
     class Meta:
         model = ParticipationRequest
         fields = ("id",)
 
 
 class HackathonParticipationRequestUpdateSerializer(serializers.ModelSerializer):
+    """Serializer for updating status of participation request."""
+
     class Meta:
         model = ParticipationRequest
         fields = ("status",)
