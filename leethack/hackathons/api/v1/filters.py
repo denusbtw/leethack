@@ -5,6 +5,10 @@ from leethack.hackathons.models import Hackathon
 
 
 class HackathonFilterSet(filters.FilterSet):
+    """
+    FilterSet for filtering Hackathon queryset.
+    """
+
     category = filters.CharFilter(field_name="category__slug", lookup_expr="exact")
     hackathon_status = filters.CharFilter(method="filter_status")
     start_after = filters.DateTimeFilter(field_name="start_datetime", lookup_expr="gte")
