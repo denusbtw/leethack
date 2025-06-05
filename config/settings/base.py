@@ -48,6 +48,7 @@ THIRD_PARTY_APPS = [
     "django_filters",
     "storages",
     "debug_toolbar",
+    "drf_spectacular",
 ]
 
 LOCAL_APPS = [
@@ -109,7 +110,8 @@ STATIC_URL = "static/"
 
 
 REST_FRAMEWORK = {
-    "EXCEPTION_HANDLER": "leethack.api.exceptions.custom_exception_handler"
+    "EXCEPTION_HANDLER": "leethack.api.exceptions.custom_exception_handler",
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
 
@@ -168,3 +170,10 @@ STORAGES = {
 INTERNAL_IPS = [
     "127.0.0.1",
 ]
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Leethack API",
+    "DESCRIPTION": "Leethack",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+}
