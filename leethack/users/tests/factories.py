@@ -10,7 +10,7 @@ class UserFactory(factory.django.DjangoModelFactory):
     role = factory.Faker("random_element", elements=User.Role.choices)
 
     @factory.post_generation
-    def password(self, create, extracted, **kwargs):
+    def password(self, create: bool, extracted: str, **kwargs):
         password = (
             extracted
             if extracted

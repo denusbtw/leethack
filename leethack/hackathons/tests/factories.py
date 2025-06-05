@@ -8,9 +8,10 @@ from django.contrib.auth import get_user_model
 from leethack.users.tests.factories import UserFactory
 
 from ..models import Hackathon, Category
+from ...participations.models import Participant
 
 User = get_user_model()
-faker = Faker()
+fake = Faker()
 
 
 class CategoryFactory(factory.django.DjangoModelFactory):
@@ -29,22 +30,24 @@ class HackathonFactory(factory.django.DjangoModelFactory):
 
     @factory.lazy_attribute
     def start_datetime(self):
-        return faker.date_time_between(
-            start_date=timezone.now(),
-            end_date=timezone.now() + timedelta(days=60),
-            tzinfo=timezone.get_current_timezone(),
+        return timezone.make_aware(
+            fake.date_time_between(
+                start_date=timezone.now(),
+                end_date=timezone.now() + timedelta(days=60),
+            )
         )
 
     @factory.lazy_attribute
     def end_datetime(self):
-        return faker.date_time_between(
-            start_date=self.start_datetime + timedelta(minutes=1),
-            end_date=self.start_datetime + timedelta(days=30),
-            tzinfo=timezone.get_current_timezone(),
+        return timezone.make_aware(
+            fake.date_time_between(
+                start_date=self.start_datetime + timedelta(minutes=1),
+                end_date=self.start_datetime + timedelta(days=30),
+            )
         )
 
     @factory.post_generation
-    def winner(self, create, extracted, *args, **kwargs):
+    def winner(self, create: bool, extracted: Participant, *args, **kwargs):
         if not create:
             return
 

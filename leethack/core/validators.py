@@ -1,10 +1,21 @@
 from PIL import Image, UnidentifiedImageError
+from django.core.files.uploadedfile import InMemoryUploadedFile, SimpleUploadedFile
 from rest_framework.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 import math
 
+from typing import Protocol, Union
 
-class BaseImageValidator:
+
+class FileValidator(Protocol):
+    # вимагає щоб будь-який клас, який відповідає інтерфейсу `__call__(file)`
+    # автоматично задовільняв цей протокол - навіть без явного наслідування.
+    def __call__(
+        self, file: Union[InMemoryUploadedFile, SimpleUploadedFile]
+    ) -> None: ...
+
+
+class BaseImageValidator(FileValidator):
     def open_image(self, file):
         try:
             image = Image.open(file)
@@ -19,7 +30,7 @@ class BaseImageValidator:
 
 
 class ImageRatioValidator(BaseImageValidator):
-    def __init__(self, config):
+    def __init__(self, config: dict):
         self.ratio = config.get("ratio")
 
     def __call__(self, file):
@@ -34,7 +45,7 @@ class ImageRatioValidator(BaseImageValidator):
 
 
 class ImageFormatValidator(BaseImageValidator):
-    def __init__(self, config):
+    def __init__(self, config: dict):
         self.allowed_formats = config.get("allowed_formats")
 
     def __call__(self, file):
@@ -56,7 +67,7 @@ class ImageFormatValidator(BaseImageValidator):
 
 
 class MinResolutionValidator(BaseImageValidator):
-    def __init__(self, config):
+    def __init__(self, config: dict):
         self.min_width = config.get("min_width")
         self.min_height = config.get("min_height")
 
@@ -72,7 +83,7 @@ class MinResolutionValidator(BaseImageValidator):
 
 
 class MaxImageSizeValidator:
-    def __init__(self, config):
+    def __init__(self, config: dict):
         self.max_size_mb = config.get("max_size_mb")
         self.max_bytes = int(self.max_size_mb * 1024 * 1024)
 

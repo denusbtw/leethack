@@ -3,10 +3,11 @@ from leethack.core.validators import (
     ImageRatioValidator,
     MinResolutionValidator,
     MaxImageSizeValidator,
+    FileValidator,
 )
 
 
-def build_image_validators(config):
+def build_image_validators(config: dict) -> list[FileValidator]:
     return [
         ImageFormatValidator(config),
         ImageRatioValidator(config),
