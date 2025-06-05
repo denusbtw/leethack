@@ -24,6 +24,16 @@ def my_participation_list_url():
     return reverse("api:v1:my_participation_list")
 
 
+@pytest.fixture
+def participant(participant_factory):
+    return participant_factory()
+
+
+@pytest.fixture
+def my_participation_detail_url(participant):
+    return reverse("api:v1:my_participation_detail", kwargs={"pk": participant.pk})
+
+
 @pytest.mark.django_db
 class TestMyParticipationRequestListAPIView:
 
@@ -226,4 +236,46 @@ class TestMyParticipationListAPIView:
         ):
             api_client.force_authenticate(user=user)
             response = getattr(api_client, method)(my_participation_list_url)
+            assert response.status_code == expected_status_code
+
+
+@pytest.mark.django_db
+class TestMyParticipationDetailAPIView:
+
+    class TestPermissions:
+
+        @pytest.mark.parametrize(
+            "method, expected_status_code",
+            [
+                ("get", status.HTTP_403_FORBIDDEN),
+                ("put", status.HTTP_403_FORBIDDEN),
+                ("patch", status.HTTP_403_FORBIDDEN),
+                ("delete", status.HTTP_403_FORBIDDEN),
+            ],
+        )
+        def test_anonymous_user(
+            self, api_client, my_participation_detail_url, method, expected_status_code
+        ):
+            response = getattr(api_client, method)(my_participation_detail_url)
+            assert response.status_code == expected_status_code
+
+        @pytest.mark.parametrize(
+            "method, expected_status_code",
+            [
+                ("get", status.HTTP_200_OK),
+                ("put", status.HTTP_405_METHOD_NOT_ALLOWED),
+                ("patch", status.HTTP_405_METHOD_NOT_ALLOWED),
+                ("delete", status.HTTP_204_NO_CONTENT),
+            ],
+        )
+        def test_authenticated_user(
+            self,
+            api_client,
+            my_participation_detail_url,
+            participant,
+            method,
+            expected_status_code,
+        ):
+            api_client.force_authenticate(user=participant.user)
+            response = getattr(api_client, method)(my_participation_detail_url)
             assert response.status_code == expected_status_code

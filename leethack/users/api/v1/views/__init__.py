@@ -1,6 +1,7 @@
 from .participation import (
-    MyParticipationRequestListAPIView,
     MyParticipationListAPIView,
+    MyParticipationDetailAPIView,
+    MyParticipationRequestListAPIView,
     MyParticipationRequestDetailAPIView,
 )
 from .hackathon import (

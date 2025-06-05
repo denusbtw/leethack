@@ -6,7 +6,7 @@ from leethack.core.utils import build_image_validators
 from .nested import CategoryNestedSerializer
 from leethack.hackathons.models import Hackathon
 
-from leethack.users.api.serializers import UserNestedSerializer
+from leethack.users.api.v1.serializers import UserNestedSerializer
 
 
 class ParticipantNestedSerializer(serializers.Serializer):

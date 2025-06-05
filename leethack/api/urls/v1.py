@@ -11,7 +11,7 @@ from leethack.participations.api.v1.views import (
     HackathonParticipantListAPIView,
     HackathonParticipantDetailAPIView,
 )
-from leethack.users.api.views import (
+from leethack.users.api.v1.views import (
     MyParticipationRequestListAPIView,
     MyParticipationRequestDetailAPIView,
     MyParticipationListAPIView,
@@ -19,6 +19,7 @@ from leethack.users.api.views import (
     UserHostedHackathonListAPIView,
     MyParticipatedHackathonListAPIView,
     MeDetailAPIView,
+    MyParticipationDetailAPIView,
 )
 
 
@@ -72,12 +73,11 @@ me_urlpatterns = [
         MyParticipationListAPIView.as_view(),
         name="my_participation_list",
     ),
-    # TODO:
-    # path(
-    #     "participations/<uuid:pk>/",
-    #     MyPaticipationDetailAPIView.as_view(),
-    #     name="my_participation_detail"
-    # ),
+    path(
+        "participations/<uuid:pk>/",
+        MyParticipationDetailAPIView.as_view(),
+        name="my_participation_detail",
+    ),
     path(
         "hosted-hackathons/",
         MyHostedHackathonListAPIView.as_view(),

@@ -2,7 +2,7 @@ from django.db import transaction
 from rest_framework import serializers
 
 from leethack.participations.models import ParticipationRequest
-from leethack.users.api.serializers import UserNestedSerializer
+from leethack.users.api.v1.serializers import UserNestedSerializer
 
 
 class BaseHackathonParticipationRequestReadSerializer(serializers.Serializer):

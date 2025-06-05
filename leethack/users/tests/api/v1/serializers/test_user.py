@@ -6,7 +6,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from leethack.core.tests.utils import create_test_image
 from django.conf import settings
 
-from leethack.users.api.serializers.user import MeUpdateSerializer
+from leethack.users.api.v1.serializers.user import MeUpdateSerializer
 
 faker = Faker()
 

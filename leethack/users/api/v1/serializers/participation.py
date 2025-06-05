@@ -36,8 +36,8 @@ class MyParticipationRequestRetrieveSerializer(
     pass
 
 
-class MyParticipationListSerializer(serializers.Serializer):
-    """Serializer for listing Participant instances where authenticated user is participating in."""
+class BaseMyParticipationReadSerializer(serializers.Serializer):
+    """Base read serializer for Participant model."""
 
     id = serializers.UUIDField(help_text="Unique identifier of participant.")
     hackathon = HackathonNestedSerializer(
@@ -46,3 +46,15 @@ class MyParticipationListSerializer(serializers.Serializer):
     created_at = serializers.DateTimeField(
         help_text="Timestamp when the participation record was created."
     )
+
+
+class MyParticipationListSerializer(BaseMyParticipationReadSerializer):
+    """Serializer for listing Participant instances where authenticated user is participating in."""
+
+    pass
+
+
+class MyParticipationRetrieveSerializer(BaseMyParticipationReadSerializer):
+    """Serializer for retrieving detailed information about participant of authenticated user."""
+
+    pass

@@ -11,7 +11,7 @@ from ..serializers import (
 )
 from .pagination import HackathonPagination
 from leethack.hackathons.models import Hackathon
-from leethack.users.api.permissions import IsHost
+from leethack.users.api.v1.permissions import IsHost
 
 
 class HackathonQuerySetMixin:
