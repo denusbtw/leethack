@@ -1,3 +1,5 @@
+import uuid
+
 from leethack.core.validators import (
     ImageFormatValidator,
     ImageRatioValidator,
@@ -14,3 +16,8 @@ def build_image_validators(config: dict) -> list[FileValidator]:
         MinResolutionValidator(config),
         MaxImageSizeValidator(config),
     ]
+
+
+def generate_unique_filename(filename):
+    ext = filename.split(".")[-1]
+    return f"{uuid.uuid4().hex}.{ext}"

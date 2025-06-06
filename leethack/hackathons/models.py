@@ -1,3 +1,6 @@
+import os
+import uuid
+
 from django.conf import settings
 from django.db import models
 from django.utils.text import slugify
@@ -6,6 +9,7 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model
 
 from leethack.core.models import UUIDModel, TimestampedModel
+from leethack.core.utils import generate_unique_filename
 
 User = get_user_model()
 
@@ -25,6 +29,11 @@ class Category(UUIDModel, TimestampedModel):
     def save(self, *args, **kwargs):
         self.slug = slugify(self.title)
         super().save(*args, **kwargs)
+
+
+def upload_hackathon_image(instance, filename):
+    unique_filename = generate_unique_filename(filename)
+    return os.path.join("hackathons/", unique_filename)
 
 
 class Hackathon(UUIDModel, TimestampedModel):
@@ -55,7 +64,7 @@ class Hackathon(UUIDModel, TimestampedModel):
         related_name="won_hackathons",
     )
     # TODO: генерувати унікальні імена для файлів
-    image = models.ImageField(upload_to="hackathons/")
+    image = models.ImageField(upload_to=upload_hackathon_image)
 
     class Meta:
         constraints = [
