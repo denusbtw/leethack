@@ -1,3 +1,5 @@
+import os
+
 from django.conf import settings
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
@@ -5,6 +7,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from leethack.core.models import UUIDModel
+from leethack.core.utils import generate_unique_filename
 
 
 class UserManager(BaseUserManager):
@@ -34,6 +37,16 @@ class UserManager(BaseUserManager):
         )
 
 
+def upload_profile_picture(instance, filename):
+    unique_filename = generate_unique_filename(filename)
+    return os.path.join("profile_pictures/", unique_filename)
+
+
+def upload_profile_background(instance, filename):
+    unique_filename = generate_unique_filename(filename)
+    return os.path.join("profile_backgrounds/", unique_filename)
+
+
 class User(UUIDModel, AbstractUser):
     class Role(models.TextChoices):
         USER = ("user", "User")
@@ -55,12 +68,12 @@ class User(UUIDModel, AbstractUser):
         help_text=_("Role of the user in the system."),
     )
     profile_picture = models.ImageField(
-        upload_to="profile_pictures/",
+        upload_to=upload_profile_picture,
         blank=True,
         default=settings.DEFAULT_PROFILE_PICTURE,
     )
     profile_background = models.ImageField(
-        upload_to="profile_backgrounds/",
+        upload_to=upload_profile_background,
         blank=True,
         default=settings.DEFAULT_PROFILE_BACKGROUND,
     )
