@@ -10,7 +10,7 @@ from ..serializers import (
     HackathonParticipationRequestRetrieveSerializer,
     HackathonParticipationRequestUpdateSerializer,
 )
-from leethack.participations.models import ParticipationRequest
+from leethack.participations.models import ParticipationRequest, Participant
 
 
 class HackathonParticipationRequestQuerySetMixin:
@@ -31,8 +31,6 @@ class HackathonParticipationRequestListCreateAPIView(
     POST: Create pending participation request for current user. Only authenticated user can perform this action.
     """
 
-    # TODO: POST 400 if current user is already participant of hackathon
-
     permission_classes = [
         ReadOnly & (permissions.IsAdminUser | IsHackathonHost)
         | (PostOnly & permissions.IsAuthenticated)
@@ -49,6 +47,11 @@ class HackathonParticipationRequestListCreateAPIView(
         if self.request.method == "GET":
             return HackathonParticipationRequestListSerializer
         return HackathonParticipationRequestCreateSerializer
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["hackathon_id"] = self.kwargs["hackathon_id"]
+        return context
 
     def perform_create(self, serializer):
         serializer.save(

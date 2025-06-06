@@ -126,6 +126,28 @@ class TestHackathonParticipationRequestListCreateAPIView:
             response = getattr(api_client, method)(list_url)
             assert response.status_code == expected_status_code
 
+        @pytest.mark.parametrize(
+            "method, expected_status_code",
+            [
+                ("get", status.HTTP_403_FORBIDDEN),
+                ("post", status.HTTP_400_BAD_REQUEST),
+            ],
+        )
+        def test_hackathon_participant(
+            self,
+            api_client,
+            list_url,
+            hackathon,
+            participant_factory,
+            method,
+            expected_status_code,
+        ):
+            participant = participant_factory(hackathon=hackathon)
+
+            api_client.force_authenticate(user=participant.user)
+            response = getattr(api_client, method)(list_url)
+            assert response.status_code == expected_status_code
+
     class TestFilter:
 
         def test_by_status(

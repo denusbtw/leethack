@@ -1,7 +1,7 @@
 from django.db import transaction
 from rest_framework import serializers
 
-from leethack.participations.models import ParticipationRequest
+from leethack.participations.models import ParticipationRequest, Participant
 from leethack.users.api.v1.serializers import UserNestedSerializer
 
 
@@ -41,6 +41,17 @@ class HackathonParticipationRequestCreateSerializer(serializers.ModelSerializer)
     class Meta:
         model = ParticipationRequest
         fields = ("id",)
+
+    def validate(self, attrs):
+        user = self.context["request"].user
+        hackathon_id = self.context["hackathon_id"]
+
+        if Participant.objects.filter(user=user, hackathon_id=hackathon_id).exists():
+            raise serializers.ValidationError(
+                "User is already participant of this hackathon."
+            )
+
+        return attrs
 
 
 class HackathonParticipationRequestUpdateSerializer(serializers.ModelSerializer):
