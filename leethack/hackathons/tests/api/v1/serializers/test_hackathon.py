@@ -57,7 +57,7 @@ class TestHackathonUpdateSerializer:
         participant = participant_factory(hackathon=hackathon)
 
         data = {"winner": participant.pk}
-        serializer = HackathonUpdateSerializer(hackathon, data)
+        serializer = HackathonUpdateSerializer(hackathon, data=data)
 
         with pytest.raises(serializers.ValidationError):
             serializer.is_valid(raise_exception=True)

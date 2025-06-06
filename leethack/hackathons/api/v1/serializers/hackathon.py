@@ -1,5 +1,6 @@
 from django.conf import settings
 from rest_framework import serializers
+from rest_framework.fields import empty
 
 from leethack.participations.models import Participant
 from leethack.core.utils import build_image_validators
@@ -96,6 +97,7 @@ class HackathonUpdateSerializer(serializers.ModelSerializer):
     )
     image = serializers.ImageField(
         validators=build_image_validators(settings.HACKATHON_IMAGE_CONFIG),
+        required=False,
         help_text="New image of hackathon.",
     )
 
@@ -118,12 +120,11 @@ class HackathonUpdateSerializer(serializers.ModelSerializer):
             "prize": {"required": False},
             "start_datetime": {"required": False},
             "end_datetime": {"required": False},
-            "image": {"required": False},
         }
 
-    def __init__(self, instance, **kwargs):
+    def __init__(self, instance=None, data=empty, **kwargs):
         # фільтрую winner учасниками поточного хакатону
-        super().__init__(**kwargs)
+        super().__init__(instance=instance, data=data, **kwargs)
 
         hackathon = instance
 

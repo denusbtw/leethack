@@ -1,10 +1,12 @@
 import datetime
 
 import pytest
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from django.utils import timezone
 from rest_framework import status
 
+from leethack.core.tests.utils import create_test_image
 from leethack.hackathons.models import Hackathon
 
 
@@ -19,8 +21,11 @@ def detail_url(hackathon):
 
 
 @pytest.fixture
-def data(category_factory, past_date, future_date, image_file):
+def data(category_factory, past_date, future_date):
     category = category_factory()
+    image_file = SimpleUploadedFile(
+        "test.jpg", create_test_image(fmt="JPEG").read(), content_type="image/jpeg"
+    )
     return {
         "title": "test hackathon",
         "description": "test decsription",

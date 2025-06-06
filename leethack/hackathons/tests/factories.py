@@ -41,7 +41,7 @@ class HackathonFactory(factory.django.DjangoModelFactory):
     def end_datetime(self):
         return timezone.make_aware(
             fake.date_time_between(
-                start_date=self.start_datetime + timedelta(minutes=1),
+                start_date=self.start_datetime + timedelta(days=1),
                 end_date=self.start_datetime + timedelta(days=30),
             )
         )

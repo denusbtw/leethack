@@ -14,6 +14,7 @@ def list_url(hackathon):
 
 @pytest.fixture
 def participant(hackathon, participant_factory):
+    print(hackathon.start_datetime, hackathon.end_datetime)
     return participant_factory(hackathon=hackathon)
 
 
