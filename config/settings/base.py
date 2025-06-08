@@ -8,9 +8,6 @@ APPS_DIR = BASE_DIR / "leethack"
 env = environ.Env()
 env.read_env(str(BASE_DIR / ".env"))
 
-
-DEBUG = env.bool("DJANGO_DEBUG", False)
-
 TIME_ZONE = "Europe/Kyiv"
 
 LANGUAGE_CODE = "en-us"
@@ -47,7 +44,6 @@ THIRD_PARTY_APPS = [
     "rest_framework",
     "django_filters",
     "storages",
-    "debug_toolbar",
     "drf_spectacular",
 ]
 
@@ -79,7 +75,6 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 MIDDLEWARE = [
-    "debug_toolbar.middleware.DebugToolbarMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -162,9 +157,11 @@ STORAGES = {
         },
     },
     "staticfiles": {
-        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
+
+MEDIA_URL = f"{AWS_S3_ENDPOINT_URL}/{AWS_STORAGE_BUCKET_NAME}/media/"
 
 
 INTERNAL_IPS = [
@@ -176,4 +173,32 @@ SPECTACULAR_SETTINGS = {
     "DESCRIPTION": "Leethack",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
+}
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "{levelname} {asctime} {module} {process:d} {thread:d} {message}",
+            "style": "{",
+        },
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": "INFO",
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+    },
 }

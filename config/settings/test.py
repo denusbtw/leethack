@@ -23,11 +23,3 @@ STORAGES = {
     },
     "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"},
 }
-
-INSTALLED_APPS = [app for app in INSTALLED_APPS if app != "debug_toolbar"]
-
-MIDDLEWARE = [
-    middleware
-    for middleware in MIDDLEWARE
-    if middleware != "debug_toolbar.middleware.DebugToolbarMiddleware"
-]
