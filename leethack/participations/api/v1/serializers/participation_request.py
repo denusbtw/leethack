@@ -51,6 +51,26 @@ class HackathonParticipationRequestCreateSerializer(serializers.ModelSerializer)
                 "User is already participant of this hackathon."
             )
 
+        participation_request = ParticipationRequest.objects.filter(
+            user=user, hackathon_id=hackathon_id
+        ).first()
+
+        if participation_request is None:
+            return attrs
+
+        if participation_request.is_pending:
+            raise serializers.ValidationError(
+                "Pending participation request already exists."
+            )
+        elif participation_request.is_approved:
+            raise serializers.ValidationError(
+                "You are already approved to participate in this hackathon."
+            )
+        elif participation_request.is_rejected:
+            raise serializers.ValidationError(
+                "Your previous request to join this hackathon was rejected."
+            )
+
         return attrs
 
 

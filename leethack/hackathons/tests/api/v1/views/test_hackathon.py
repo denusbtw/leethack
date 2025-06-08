@@ -62,7 +62,7 @@ class TestHackathonListCreateAPIView:
                 ("post", status.HTTP_403_FORBIDDEN),
             ],
         )
-        def test_default_user(
+        def test_not_host(
             self, api_client, list_url, user, method, expected_status_code
         ):
             api_client.force_authenticate(user=user)
@@ -178,6 +178,60 @@ class TestHackathonListCreateAPIView:
                 str(john_hackathon.id)
             }
 
+    def test_create_invalid_data_returns_400(
+        self, api_client, list_url, host, past_date, future_date
+    ):
+        api_client.force_authenticate(user=host)
+        invalid_data = {
+            "title": "",
+            "start_datetime": future_date,
+            "past_date": past_date,
+        }
+        response = api_client.post(list_url, data=invalid_data)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert "end_datetime" in response.data
+
+    def test_create_ignores_host_field_in_request(
+        self, api_client, list_url, data, user, host
+    ):
+        api_client.force_authenticate(user=host)
+
+        data["host"] = user.pk
+        response = api_client.post(list_url, data=data)
+        assert response.status_code == status.HTTP_201_CREATED
+
+        hackathon_id = response.data["id"]
+        hackathon = Hackathon.objects.get(pk=hackathon_id)
+        assert hackathon.host == host
+
+    def test_pagination_works(self, api_client, list_url, hackathon_factory):
+        hackathon_factory.create_batch(5)
+        response = api_client.get(list_url, {"page_size": 2})
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.data["results"]) == 2
+        assert "count" in response.data
+        assert response.data["count"] == 5
+
+    def test_ordering_by_prize_asc(self, api_client, list_url, hackathon_factory):
+        hackathon_factory(prize="500")
+        hackathon_factory(prize="1000")
+        hackathon_factory(prize="750")
+
+        response = api_client.get(list_url, {"ordering": "prize"})
+        assert response.status_code == status.HTTP_200_OK
+        prizes = [hackathon["prize"] for hackathon in response.data["results"]]
+        assert prizes == sorted(prizes)
+
+    def test_ordering_by_prize_desc(self, api_client, list_url, hackathon_factory):
+        hackathon_factory(prize="500")
+        hackathon_factory(prize="1000")
+        hackathon_factory(prize="750")
+
+        response = api_client.get(list_url, {"ordering": "-prize"})
+        assert response.status_code == status.HTTP_200_OK
+        prizes = [hackathon["prize"] for hackathon in response.data["results"]]
+        assert prizes == sorted(prizes, reverse=True)
+
 
 @pytest.mark.django_db
 class TestHackathonDetailAPIView:
@@ -263,3 +317,25 @@ class TestHackathonDetailAPIView:
             api_client.force_authenticate(user=admin_user)
             response = getattr(api_client, method)(detail_url)
             assert response.status_code == expected_status_code
+
+    def test_patch_valid_data(self, api_client, detail_url, hackathon):
+        api_client.force_authenticate(user=hackathon.host)
+        response = api_client.patch(detail_url, data={"title": "updated title"})
+        assert response.status_code == status.HTTP_200_OK
+        hackathon.refresh_from_db()
+        assert hackathon.title == "updated title"
+
+    def test_patch_invalid_data(self, api_client, detail_url, hackathon):
+        api_client.force_authenticate(user=hackathon.host)
+        response = api_client.patch(detail_url, data={"prize": "invalid"})
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    def test_host_field_cannot_be_modified(
+        self, api_client, detail_url, hackathon, user
+    ):
+        api_client.force_authenticate(user=hackathon.host)
+        old_host = hackathon.host
+        response = api_client.patch(detail_url, data={"host": user.pk})
+        assert response.status_code == status.HTTP_200_OK
+        hackathon.refresh_from_db()
+        assert hackathon.host == old_host

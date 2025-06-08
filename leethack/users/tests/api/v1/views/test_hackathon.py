@@ -215,6 +215,17 @@ class TestMyParticipatedHackathonListAPIView:
                 str(john_hackathon.id)
             }
 
+    def test_pagination_works(
+        self, api_client, my_participated_hackathon_list_url, user, participant_factory
+    ):
+        api_client.force_authenticate(user=user)
+        participant_factory.create_batch(5, user=user)
+        response = api_client.get(my_participated_hackathon_list_url, {"page_size": 2})
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.data["results"]) == 2
+        assert "count" in response.data
+        assert response.data["count"] == 5
+
 
 @pytest.mark.django_db
 class TestMyHostedHackathonListAPIView:
@@ -399,6 +410,16 @@ class TestMyHostedHackathonListAPIView:
                 str(john_hackathon.id)
             }
 
+    def test_pagination_works(
+        self, api_client, my_hosted_hackathon_list_url, host, hackathon_factory
+    ):
+        api_client.force_authenticate(user=host)
+        hackathon_factory.create_batch(5, host=host)
+        response = api_client.get(my_hosted_hackathon_list_url, {"page_size": 2})
+        assert len(response.data["results"]) == 2
+        assert "count" in response.data
+        assert response.data["count"] == 5
+
 
 @pytest.mark.django_db
 class TestUserHostedHackathonListAPIView:
@@ -562,3 +583,12 @@ class TestUserHostedHackathonListAPIView:
             assert {h["id"] for h in response.data["results"]} == {
                 str(john_hackathon.id)
             }
+
+    def test_pagination_works(
+        self, api_client, user_hosted_hackathon_list, host, hackathon_factory
+    ):
+        hackathon_factory.create_batch(5, host=host)
+        response = api_client.get(user_hosted_hackathon_list, {"page_size": 2})
+        assert len(response.data["results"]) == 2
+        assert "count" in response.data
+        assert response.data["count"] == 5

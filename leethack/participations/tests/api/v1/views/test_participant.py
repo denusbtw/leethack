@@ -111,6 +111,43 @@ class TestHackathonParticipantListAPIView:
             response = getattr(api_client, method)(list_url)
             assert response.status_code == expected_status_code
 
+    def test_search(
+        self,
+        api_client,
+        list_url,
+        hackathon,
+        participant_factory,
+        user_factory,
+        john,
+        alice,
+        admin_user,
+    ):
+        api_client.force_authenticate(user=admin_user)
+
+        participant_factory(user=john, hackathon=hackathon)
+        participant_factory(user=alice, hackathon=hackathon)
+
+        response = api_client.get(list_url, {"search": "jo"})
+        assert response.status_code == status.HTTP_200_OK
+
+        usernames = [
+            participant["user"]["username"] for participant in response.data["results"]
+        ]
+        assert "john" in usernames
+        assert all("jo" in username for username in usernames)
+
+    def test_pagination_works(
+        self, api_client, list_url, hackathon, participant_factory, admin_user
+    ):
+        api_client.force_authenticate(user=admin_user)
+
+        participant_factory.create_batch(5, hackathon=hackathon)
+        response = api_client.get(list_url, {"page_size": 2})
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.data["results"]) == 2
+        assert "count" in response.data
+        assert response.data["count"] == 5
+
 
 @pytest.mark.django_db
 class TestHackathonParticipantDetailAPIView:

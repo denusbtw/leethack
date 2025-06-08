@@ -167,6 +167,88 @@ class TestHackathonParticipationRequestListCreateAPIView:
                 str(approved_participation_request.id)
             }
 
+    def test_search_by_username(
+        self,
+        api_client,
+        list_url,
+        hackathon,
+        participation_request_factory,
+        john,
+        alice,
+        admin_user,
+    ):
+        api_client.force_authenticate(user=admin_user)
+        participation_request_factory(user=john, hackathon=hackathon)
+        participation_request_factory(user=alice, hackathon=hackathon)
+
+        response = api_client.get(list_url, {"search": "jo"})
+        assert response.status_code == status.HTTP_200_OK
+        usernames = {
+            participant["user"]["username"] for participant in response.data["results"]
+        }
+        assert "john" in usernames
+        assert all("jo" in username for username in usernames)
+
+    def test_pagination_works(
+        self, api_client, list_url, hackathon, participation_request_factory, admin_user
+    ):
+        api_client.force_authenticate(user=admin_user)
+
+        participation_request_factory.create_batch(5, hackathon=hackathon)
+        response = api_client.get(list_url, {"page_size": 2})
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.data["results"]) == 2
+        assert "count" in response.data
+        assert response.data["count"] == 5
+
+    def test_cannot_create_request_if_previous_rejected(
+        self,
+        api_client,
+        list_url,
+        user,
+        participation_request_factory,
+        hackathon,
+    ):
+        api_client.force_authenticate(user=user)
+        participation_request_factory(
+            user=user, hackathon=hackathon, status=ParticipationRequest.Status.REJECTED
+        )
+
+        response = api_client.post(list_url)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    def test_cannot_create_request_if_previous_pending(
+        self,
+        api_client,
+        list_url,
+        user,
+        participation_request_factory,
+        hackathon,
+    ):
+        api_client.force_authenticate(user=user)
+        participation_request_factory(
+            user=user, hackathon=hackathon, status=ParticipationRequest.Status.PENDING
+        )
+
+        response = api_client.post(list_url)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    def test_cannot_create_request_if_previous_approved(
+        self,
+        api_client,
+        list_url,
+        user,
+        participation_request_factory,
+        hackathon,
+    ):
+        api_client.force_authenticate(user=user)
+        participation_request_factory(
+            user=user, hackathon=hackathon, status=ParticipationRequest.Status.APPROVED
+        )
+
+        response = api_client.post(list_url)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
 
 @pytest.mark.django_db
 class TestHackathonParticipationRequestDetailAPIView:
@@ -251,3 +333,21 @@ class TestHackathonParticipationRequestDetailAPIView:
             api_client.force_authenticate(user=hackathon.host)
             response = getattr(api_client, method)(detail_url, data=data)
             assert response.status_code == expected_status_code
+
+    def test_patch_approve_request(
+        self, api_client, detail_url, hackathon, participation_request
+    ):
+        api_client.force_authenticate(user=hackathon.host)
+        data = {"status": ParticipationRequest.Status.APPROVED}
+        response = api_client.patch(detail_url, data=data)
+        assert response.status_code == status.HTTP_200_OK
+        participation_request.refresh_from_db()
+        assert participation_request.status == data["status"]
+
+    def test_patch_invalid_data(
+        self, api_client, detail_url, hackathon, participation_request
+    ):
+        api_client.force_authenticate(user=hackathon.host)
+        data = {"status": "invalid"}
+        response = api_client.patch(detail_url, data=data)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
